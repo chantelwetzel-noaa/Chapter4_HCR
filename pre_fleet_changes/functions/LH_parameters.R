@@ -28,25 +28,12 @@ a.linear    <- a3 #floor(a3) + 1
 # The values below are the summer north fishery (2P) (fsp5 & fsp6 are set to -999)
 # The survey values are for the NWFSC survey
 # The petrale assessment has differential selectivity by sex but currently ignoring it
-# fsp1        <- c(52,39)       ; ssp1        <- c(42, 36)
-# fsp2        <- c(3, 3)        ; ssp2        <- c(3, 3)
-# fsp3        <- c(5, 3.2)      ; ssp3        <- c(5, 4.5)  
-# fsp4        <- c(14, 14)      ; ssp4        <- c(14, 14)
-# fsp5        <- c(-999, -999)  ; ssp5        <- c(-999, -999) 
-# fsp6        <- c(-999, -999)  ; ssp6        <- c(-999, -999)
-
-# Fishery Selectivity for two fleets
-# dim (fleet = 2, sex = 2, selectivity parameter = 6)
-fsp = array(NA, dim=c(2, 2, 6))
-fsp[1,1,] = c(52, 3,   5, 14, -999, -999) #fishery 1 females
-fsp[1,2,] = c(39, 3, 3.2, 14, -999, -999) #fishery 1 males
-fsp[2,1,] = c(47, 3,   4, 14, -999, -999) #fishery 2 females
-fsp[2,2,] = c(39.5, 3,   3, 14, -999, -999) #fishery 2 females
-
-# Survey Selectivity for a single survey
-ssp = matrix(NA, 2, 6)
-ssp[1,] = c(42, 3,   5, 14, -999, -999) #survey females
-ssp[2,] = c(36, 3, 4.5, 14, -999, -999)
+fsp1        <- c(52,39)       ; ssp1        <- c(42, 36)
+fsp2        <- c(3, 3)        ; ssp2        <- c(3, 3)
+fsp3        <- c(5, 3.2)      ; ssp3        <- c(5, 4.5)  
+fsp4        <- c(14, 14)      ; ssp4        <- c(14, 14)
+fsp5        <- c(-999, -999)  ; ssp5        <- c(-999, -999) 
+fsp6        <- c(-999, -999)  ; ssp6        <- c(-999, -999)
  
 #Solved using put code name here
 Fmsy <- 0.25 # DUMMY VALUE!!!!!!!!!!!!!!!!!!!!!!   

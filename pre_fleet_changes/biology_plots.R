@@ -5,7 +5,6 @@ source("C:/Flatfish_MSC/code/functions/Get_Biology.R")
 load("C:/Flatfish_MSC/parm_dist_list")
 
 nsim = 1000
-f.fleets = 2
 len <- array(NA, dim = c(ages, 2, nsim))
 wght <- array(NA, dim = c(ages, 2, nsim))
 wght.at.len <- array(NA, dim = c(length(len.step), 2, nsim))
@@ -29,10 +28,10 @@ for(i in 1:nsim){
  
 m.f <- parm.list$m.f
 m.m <- parm.list$m.m 
-selec.age <- out$selec.age
-selec.age <- out$selec.age
-obs.selec.age <- out$obs.selec.age
-obs.selec.age <- out$obs.selec.age
+selec.f <- out$selec.age.f
+selec.m <- out$selec.age.m
+obs.selec.f <- out$obs.selec.age.f
+obs.selec.m <- out$obs.selec.age.m
 
 len.f.ci  <- apply(len[,1,], 1, quantile,  c(0.05, 0.50, 0.95))
 len.m.ci  <- apply(len[,2,], 1, quantile,  c(0.05, 0.50, 0.95))
@@ -81,23 +80,19 @@ lines(1:ages, wght.m.ci[2,], col = 'white', lty = 1, lwd = 2)
 box()
 
 # Fishery Selectivity
-# Fishery 1
-plot(1:ages, selec.age[1,1,], ylab = "Fishery Selectivity", xlab = "Age", xlim = c(1, 42), ylim = c(0, 1.05), col = 1, type = 'l', 
-  xaxs="i", yaxs = 'i', lwd = 1)
-lines(1:ages, selec.age[1,2,], lty = 2, col = 1, lwd = 1)
-lines(1:ages, selec.age[2,1,], lty = 3, col = 'grey50', lwd = 2)
-lines(1:ages, selec.age[2,2,], lty = 4, col = 'grey50', lwd = 2)
-legend("bottomright", legend = c("Fishery 1 (F)", "Fishery 1 (M)", "Fishery 2 (F)", "Fishery 2 (M)"), 
-  lty = c(1,2,3,4), col = c(1,1,'grey50','grey50'), lwd = c(1,1,2,2), bty = 'n', cex = 1.1)
-
+plot(1:ages, selec.f, ylab = "Fishery Selectivity", xlab = "Age", xlim = c(1, 42), ylim = c(0, 1.05), col = 1, type = 'l', xaxs="i", yaxs = 'i', lwd = 1)
+lines(1:ages, selec.m, lty = 2, col = 1, lwd = 1)
+legend("bottomright", legend = c("Female", "Male"), lty = c(1,2), bty = 'n', cex = 1.1)
+#lines(1:ages, out$mature.age, col = 2, lty = 1, lwd =1)
 
 # Survey Selectivity
-plot( 1:ages, obs.selec.age[,1], ylab = "Survey Selectivity", xlab = "Age", xlim = c(1, 42), ylim = c(0, 1.05), col = 1, type = 'l', xaxs="i", yaxs = 'i', lwd = 1)
-lines(1:ages, obs.selec.age[,2], lty = 2, col = 1, lwd = 1)
+plot(1:ages, obs.selec.f, ylab = "Survey Selectivity", xlab = "Age", xlim = c(1, 42), ylim = c(0, 1.05), col = 1, type = 'l', xaxs="i", yaxs = 'i', lwd = 1)
+lines(1:ages, obs.selec.m, lty = 2, col = 1, lwd = 1)
 legend("bottomright", legend = c("Female", "Male"), lty = c(1,2), bty = 'n',cex = 1.1)
 #lines(1:ages, out$mature.age, col = 2, lty = 1, lwd =1)
 
 #Maturity
-#plot(1:ages, out$mature.age, ylab = "Mature", xlab= "Age", col = 2, type='l', lwd =2)
-#plot(len.step, mature.len, ylab = "Mature", xlab= "Age", col = 2, type='l', lwd =2)
+plot(1:ages, out$mature.age, ylab = "Mature", xlab= "Age", col = 2, type='l', lwd =2)
+
+plot(len.step, mature.len, ylab = "Mature", xlab= "Age", col = 2, type='l', lwd =2)
 

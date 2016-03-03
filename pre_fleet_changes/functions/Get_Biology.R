@@ -175,70 +175,21 @@ Get_Biology<- function()
 
 #Selectivity Function=====================================================================================
   Selex <- list()
-  selec <- array(NA,  dim = c(f.fleets, length(len.step),sexes) )
-  selec.age<-array(0, dim = c(f.fleets, sexes, ages) )
-  #selec.age.f<-array(0, dim = c(f.fleets, ages, 1) ) 
+  selec <- matrix(NA,length(len.step),sexes)
+  selec.age.m<-matrix(0,ages,1)
+  selec.age.f<-matrix(0,ages,1) 
   
-  #Double Normal Selectivity
-  for (f in 1:2) { # over fleets
-    for (g in 1:2){ # over sexes
-      startbin <- 1
-      peak <- fsp[f,g,1]
-      upselex <- exp(fsp[f,g,3])
-      downselex <- exp(fsp[f,g,4])
-      final <- fsp[f,g,6]
-    
-      point1 <- 1 / (1 + exp(-fsp[f,g,5])) 
-      t1min <- exp(-((len.step[startbin] + 1) - peak)^2 / upselex)
-      peak2 <- peak + 2 + (0.99 * (len.step[length(len.step)] + 1) - peak - 2) / (1 + exp(-fsp[f,g,2]))
-      point2 <- 1 / (1 + exp(-final))
-      t2min <- exp(-((len.step[length(len.step)] + 1) - peak2)^2 / downselex)
-      t1 <- len.step + 1 - peak
-      t2 <- len.step + 1 - peak2
-      join1 <- 1 / (1 + exp(-(20 / (1 + abs(t1))) * t1))
-      join2 <- 1 / (1 + exp(-(20 / (1 + abs(t2))) * t2))
-      asc <- point1 + (1 - point1) * (exp(-t1^2 / upselex) - t1min) / (1 - t1min)
-      if (fsp[f,g,5] <= -999) { asc <-  exp(-(t1^2) / upselex)}
-      dsc <- 1 +(point2-1)*(exp(-t2^2 / downselex) - 1) / (t2min - 1)
-      if (fsp[f,g,6] <- -999) { dsc <- exp(-(t2^2) / downselex)}
-    
-      selec[f,,g] <- asc * (1-join1) + join1 * (1 - join2 + dsc * join2)
-    }
-  }
-
-  #Mid-year Selectivity by Age
-  for (f in 1:f.fleets){
-    #selec.age.m <-(t(Phi$mid.phi.m)) %*% selec[,2]
-    #selec.age.f <-(t(Phi$mid.phi.f)) %*% selec[,1]
-    selec.age[f,2,] <-(t(Phi$mid.phi.m)) %*% as.matrix(selec[f,,2])
-    selec.age[f,1,] <-(t(Phi$mid.phi.f)) %*% as.matrix(selec[f,,1])
-  }
-
-  Selex[[1]] <- selec
-  Selex[[2]] <- selec.age
-  #Selex[[3]] <- selec.age.m
-  #Selex[[4]] <- peak
-  names(Selex) <- c("selec","selec.age")
-
-#Obs_Selectivity =========================================================================================================================================
- Obs.Selex <- list()
- obs.selec<-matrix(0,length(mid.len.step),sexes) 
- #obs.selec.age.m<-matrix(0,ages,1)
- #obs.selec.age.f<-matrix(0,ages,1)
- obs.selec.age<-matrix(0, ages, sexes) 
-
-
   #Double Normal Selectivity
   for (g in 1:2){
     startbin <- 1
-    peak <- ssp[g,1]
-    upselex <- exp(ssp[g,3])
-    downselex <- exp(ssp[g,4])
-    final <- ssp[g,6]
+    peak <- fsp1[g]
+    upselex <- exp(fsp3[g])
+    downselex <- exp(fsp4[g])
+    final <- fsp6[g]
   
-    point1 <- 1 / (1 + exp(-ssp[g,5])) 
+    point1 <- 1 / (1 + exp(-fsp5[g])) 
     t1min <- exp(-((len.step[startbin] + 1) - peak)^2 / upselex)
-    peak2 <- peak + 2 + (0.99 * (len.step[length(len.step)] + 1) - peak - 2) / (1 + exp(-ssp[g,2]))
+    peak2 <- peak + 2 + (0.99 * (len.step[length(len.step)] + 1) - peak - 2) / (1 + exp(-fsp2[g]))
     point2 <- 1 / (1 + exp(-final))
     t2min <- exp(-((len.step[length(len.step)] + 1) - peak2)^2 / downselex)
     t1 <- len.step + 1 - peak
@@ -246,23 +197,65 @@ Get_Biology<- function()
     join1 <- 1 / (1 + exp(-(20 / (1 + abs(t1))) * t1))
     join2 <- 1 / (1 + exp(-(20 / (1 + abs(t2))) * t2))
     asc <- point1 + (1 - point1) * (exp(-t1^2 / upselex) - t1min) / (1 - t1min)
-    if (ssp[g,5] <= -999) { asc <-  exp(-(t1^2) / upselex)}
+    if (fsp5[g] <= -999) { asc <-  exp(-(t1^2) / upselex)}
     dsc <- 1 +(point2-1)*(exp(-t2^2 / downselex) - 1) / (t2min - 1)
-    if (ssp[g,6] <- -999) { dsc <- exp(-(t2^2) / downselex)}
+    if (fsp6[g] <- -999) { dsc <- exp(-(t2^2) / downselex)}
+  
+    selec[,g] <- asc * (1-join1) + join1 * (1 - join2 + dsc * join2)
+  }
+ 
+  #selec[,2] <- selec[,1]
+
+
+  #Mid-year Selectivity by Age
+  selec.age.m <-(t(Phi$mid.phi.m)) %*% selec[,2]
+  selec.age.f <-(t(Phi$mid.phi.f)) %*% selec[,1]
+  
+  Selex[[1]] <- selec
+  Selex[[2]] <- selec.age.f
+  Selex[[3]] <- selec.age.m
+  Selex[[4]] <- peak
+  names(Selex) <- c("selec","selec.age.f","selec.age.m", "peak")
+
+#Obs_Selectivity =========================================================================================================================================
+ Obs.Selex <- list()
+ obs.selec<-matrix(0,length(mid.len.step),sexes) 
+ obs.selec.age.m<-matrix(0,ages,1)
+ obs.selec.age.f<-matrix(0,ages,1)
+
+  #Double Normal Selectivity
+  for (g in 1:2){
+    startbin <- 1
+    peak <- ssp1[g]
+    upselex <- exp(ssp3[g])
+    downselex <- exp(ssp4[g])
+    final <- ssp6[g]
+  
+    point1 <- 1 / (1 + exp(-ssp5[g])) 
+    t1min <- exp(-((len.step[startbin] + 1) - peak)^2 / upselex)
+    peak2 <- peak + 2 + (0.99 * (len.step[length(len.step)] + 1) - peak - 2) / (1 + exp(-ssp2[g]))
+    point2 <- 1 / (1 + exp(-final))
+    t2min <- exp(-((len.step[length(len.step)] + 1) - peak2)^2 / downselex)
+    t1 <- len.step + 1 - peak
+    t2 <- len.step + 1 - peak2
+    join1 <- 1 / (1 + exp(-(20 / (1 + abs(t1))) * t1))
+    join2 <- 1 / (1 + exp(-(20 / (1 + abs(t2))) * t2))
+    asc <- point1 + (1 - point1) * (exp(-t1^2 / upselex) - t1min) / (1 - t1min)
+    if (ssp5[g] <= -999) { asc <-  exp(-(t1^2) / upselex)}
+    dsc <- 1 +(point2-1)*(exp(-t2^2 / downselex) - 1) / (t2min - 1)
+    if (ssp6[g] <- -999) { dsc <- exp(-(t2^2) / downselex)}
   
     obs.selec[,g] <- asc * (1-join1) + join1 * (1 - join2 + dsc * join2)
   }
  
   #Mid-year Selectivity by Age
-  #obs.selec.age.m <-(t(Phi$mid.phi.m))%*%obs.selec[,2]
-  #obs.selec.age.f <-(t(Phi$mid.phi.f))%*%obs.selec[,1]
-  obs.selec.age[,1] <-(t(Phi$mid.phi.f))%*%obs.selec[,1]
-  obs.selec.age[,2] <-(t(Phi$mid.phi.m))%*%obs.selec[,2]
+  obs.selec.age.m <-(t(Phi$mid.phi.m))%*%obs.selec[,2]
+  obs.selec.age.f <-(t(Phi$mid.phi.f))%*%obs.selec[,1]
 
   Obs.Selex[[1]] <- obs.selec
-  Obs.Selex[[2]] <- obs.selec.age
-  #Obs.Selex[[3]] <- obs.selec.age.f
-  names(Obs.Selex) <- c("obs.selec","obs.selec.age")#,"obs.selec.age.f")
+  Obs.Selex[[2]] <- obs.selec.age.m
+  Obs.Selex[[3]] <- obs.selec.age.f
+  names(Obs.Selex) <- c("obs.selec","obs.selec.age.m","obs.selec.age.f")
 
 #=======================================================================================================
 
@@ -281,20 +274,18 @@ Get_Biology<- function()
  Bio[[12]]<- Fecund$fecund
  Bio[[13]]<- Phi$sigma.len
  Bio[[14]]<- Selex$selec
- Bio[[15]]<- Selex$selec.age
- #Bio[[16]]<- Selex$selec.age.m
- Bio[[16]]<- Obs.Selex$obs.selec
- Bio[[17]]<- Obs.Selex$obs.selec.age
- #Bio[[19]]<- Obs.Selex$obs.selec.age.m
- #Bio[[18]]<- Selex$peak
- Bio[[18]]<- Fecund$mature.age
- Bio[[19]]<- Fecund$mature.len
+ Bio[[15]]<- Selex$selec.age.f
+ Bio[[16]]<- Selex$selec.age.m
+ Bio[[17]]<- Obs.Selex$obs.selec
+ Bio[[18]]<- Obs.Selex$obs.selec.age.f
+ Bio[[19]]<- Obs.Selex$obs.selec.age.m
+ Bio[[20]]<- Selex$peak
+ Bio[[21]]<- Fecund$mature.age
+ Bio[[22]]<- Fecund$mature.len
  names(Bio) <- c("phi.f","phi.m","mid.phi.m","mid.phi.f","mid.wght","wght","mid.wght.at.len","wght.at.len",
-                "mid.len","wght","len","fecund","sigma.len","selec","selec.age","obs.selec",
-                "obs.selec.age","mature.age", "mature.len")
- #names(Bio) <- c("phi.f","phi.m","mid.phi.m","mid.phi.f","mid.wght","wght","mid.wght.at.len","wght.at.len",
- #               "mid.len","wght","len","fecund","sigma.len","selec","selec.age.f","selec.age.m","obs.selec",
- #               "obs.selec.age.f","obs.selec.age.m", "peak", "mature.age", "mature.len")
+                "mid.len","wght","len","fecund","sigma.len","selec","selec.age.f","selec.age.m","obs.selec",
+                "obs.selec.age.f","obs.selec.age.m", "peak", "mature.age", "mature.len")
  return(Bio)
 }
 
+#cmp_bio = cmpfun(Get_Biology)

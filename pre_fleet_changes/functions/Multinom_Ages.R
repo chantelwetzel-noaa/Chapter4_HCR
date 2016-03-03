@@ -33,7 +33,7 @@ Multinom_Ages <- function(catch.type , age.samp , AgeError) {
     #set.seed(age.err.seed[nsim] + y)
     ages.out <- numeric(max.age * 2)
     #ages.out <- numeric(2*ages -2)
-    age.sd   <- rep(0.10, ages - 1) #1/(20 + exp(-0.05*(1:(ages-1))))
+    age.sd   <- rep(0.05, ages - 1) #1/(20 + exp(-0.05*(1:(ages-1))))
     age.sd   <- c(age.sd, age.sd)
 
     for(z in 1:age.samp){

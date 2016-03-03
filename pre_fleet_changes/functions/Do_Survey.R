@@ -26,8 +26,8 @@ Do_Survey <- function(biology, f.values, numbers, index)
     #ind is used to access biological values that are track prior to the survey start (numbers and f)
     #ind <- pre.fishery.yrs + index[a]
     ind  <- index[a]
-    vul.bio.obs        <- (temp1) * numbers[ind,,1] * exp(-survey.time * (m.f + biology$selec.age[1,1,] * f.values[1,ind] + biology$selec.age[2,1,] * f.values[2,ind])) +
-                          (temp2) * numbers[ind,,2] * exp(-survey.time * (m.m + biology$selec.age[1,2,] * f.values[1,ind] + biology$selec.age[2,2,] * f.values[2,ind]))   
+    vul.bio.obs        <- (temp1) * numbers[ind,,1] * exp(-survey.time * (m.f + biology$selec.age.f * f.values[ind])) +
+                          (temp2) * numbers[ind,,2] * exp(-survey.time * (m.m + biology$selec.age.m * f.values[ind]))   
     temp.vul.total[a]  <- sum(vul.bio.obs)     
     temp.index    [a]  <- Q * temp.vul.total[a] * exp(survey.err[ind] - 0.5 * (survey.err[ind])^2 )
 
@@ -35,10 +35,8 @@ Do_Survey <- function(biology, f.values, numbers, index)
     #Catch @ age and length
     for (b in 1:ages)
     {   
-      temp.cal[a,b,,1] <- calc1[,b] * (numbers[ind,b,1] * exp(-survey.time * (m.f + biology$selec.age[1,1,b] * f.values[1,ind] +
-                                                                                    biology$selec.age[2,1,b] * f.values[2,ind])))      
-      temp.cal[a,b,,2] <- calc2[,b] * (numbers[ind,b,2] * exp(-survey.time * (m.m + biology$selec.age[1,2,b] * f.values[1,ind] +
-                                                                                    biology$selec.age[2,2,b] * f.values[2,ind])))
+      temp.cal[a,b,,1] <- calc1[,b] * (numbers[ind,b,1] * exp(-survey.time * (m.f + biology$selec.age.f[b] * f.values[ind])))      
+      temp.cal[a,b,,2] <- calc2[,b] * (numbers[ind,b,2] * exp(-survey.time * (m.m + biology$selec.age.m[b] * f.values[ind])))
     } 
           
   }

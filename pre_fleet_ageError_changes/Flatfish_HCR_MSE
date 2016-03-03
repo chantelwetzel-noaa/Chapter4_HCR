@@ -1,5 +1,5 @@
 ##############################################
-##     Management Strategy Evaluation 		  ##
+##     Management Strategy Evaluation 		##
 ##                  for                     ##
 ##        U.S. West Coast Flatfish          ##
 ##          Harvest Control Rule            ##
@@ -8,16 +8,13 @@
 ##       Started: September 2015            ##
 ##############################################
 
-#source("//even_more_home//h_cwetzel//PhD//Flatfish_MSC//code//Flatfish_HCR_MSE.R") 
-#drive   <-"//home//cwetzel//h_cwetzel//PhD"
+
 drive   <-"C:" #"//home//cwetzel//h_cwetzel"
-start.n <- 184
-end.n   <- 200
-hcr.opt <- "hcr_20_5"
+start.n <- 1
+end.n   <- 287
+hcr.opt <- "hcr_40_10"
 #HCR Options: 25_5; 40_10; 30_10; 20_5
-steep     <- 0.85
-steep.set <- 0.75
-auto      <- FALSE
+steep   <- 0.85
 
 tantalus <- FALSE
 github   <- FALSE
@@ -28,8 +25,8 @@ determ    <- FALSE
 use_catch <- FALSE
 catchEQ   <- "ramp_constant"
 
-use.len.data <- TRUE
-n.lambda     <- ifelse(use.len.data, 0, 3)
+use.len.data <- FALSE
+n.lambda     <- ifelse(use.len.data, 0, 2)
 data.type    <- 4 #4=lengths 5 = ages
 skip.len     <- ifelse(use.len.data, FALSE, TRUE)
  
@@ -37,15 +34,12 @@ require( compiler )
 require( r4ss )
 
 #Set the directory 
-if (steep == steep.set){ directory <-  paste0(drive, "/Flatfish_MSC/Steep_", steep*100, "/") }
-if (steep != steep.set){ directory <-  paste0(drive, "/Flatfish_MSC/Steep_", steep*100, "_", steep.set*100,"/")}
-if (steep == steep.set & auto == TRUE) { directory <-  paste0(drive, "/Flatfish_MSC/Steep_", steep*100,"_auto", "/") }
+directory <-  paste0(drive, "/Flatfish_MSC/Steep_", steep*100, "/")
 dir.create(directory)
 directory <<- paste0(directory, "hcr_option_", hcr.opt,"_", catchEQ, "_sims_",start.n,"_",end.n,"/")
 dir.create(directory)
 dir.create(paste(directory,"/save",sep=""))
 dir.create(paste(directory,"/ctl", sep=""))
-dir.create(paste(directory,"/report", sep=""))
 
  #Move the executable to the correct folder to run simulations
  if (!tantalus) {
@@ -101,8 +95,8 @@ for (nsim in start.n:end.n)
   if (L1f < 16) {a3 = a.linear = 1}
   if (L1m < 16) {a3 = a.linear = 1}
  
-  # Set up the bias adjustment parameters -----------------------------------------------------------------------------------
-  # Bias adjustment parameters
+  #Set up the bias adjustment parameters -----------------------------------------------------------------------------------
+  #Bias adjustment parameters
   main.rec.start <- 1 #ages
   main.rec.end   <- setup.yrs + pre.fishery.yrs # - 6   
   start.devs     <- 0 #ages - 10
@@ -112,78 +106,79 @@ for (nsim in start.n:end.n)
   last.bias      <- setup.yrs + pre.fishery.yrs - 5        
   last.no.bias   <- setup.yrs + pre.fishery.yrs - 4
   max.bias.adj   <- 0.80
+  #pre.model.devs <- 1
    
  # Catch History -----------------------------------------------------------------------------------------------------------
   if ( use_catch ){
- 	  catch.dev <- c(rnorm(10, 0, 0.50),
- 	  			rnorm(20, 0, 0.07),
- 	  			rnorm(20, 0, 0.15))
- 	  CatchTot <- rep(0,setup.yrs) ;  CatchTot[1] <- 20
- 	    
- 	  for (y in 2:(setup.yrs-11)) { 
- 	     CatchTot[y]<- CatchTot[y-1]*1.5 
- 	     if (CatchTot[y-1]*1.4 > 1000 ) { 
- 	         CatchTot[y] <- 1000 }  
- 	  }
- 	  for (y in (setup.yrs-20):setup.yrs) { 
- 	     CatchTot[y]<- CatchTot[y-1]*0.97
- 	  }
- 	    
- 	  CatchTot     <- round(CatchTot,0)    
- 	  CatchTot.err <- round(CatchTot + CatchTot * catch.dev,0)
- 	  hist.catch   <- c(rep(0,pre.fishery.yrs),CatchTot.err)
+ 	catch.dev <- c(rnorm(10, 0, 0.50),
+ 				rnorm(20, 0, 0.07),
+ 				rnorm(20, 0, 0.15))
+ 	CatchTot <- rep(0,setup.yrs) ;  CatchTot[1] <- 20
  	  
- 	  # Set temporary constant catches
- 	  hist.catch   <- c(rep(0,pre.fishery.yrs), rep(1000, setup.yrs))
+ 	for (y in 2:(setup.yrs-11)) { 
+ 	   CatchTot[y]<- CatchTot[y-1]*1.5 
+ 	   if (CatchTot[y-1]*1.4 > 1000 ) { 
+ 	       CatchTot[y] <- 1000 }  
+ 	}
+ 	for (y in (setup.yrs-20):setup.yrs) { 
+ 	   CatchTot[y]<- CatchTot[y-1]*0.97
+ 	}
+ 	  
+ 	CatchTot     <- round(CatchTot,0)    
+ 	CatchTot.err <- round(CatchTot + CatchTot * catch.dev,0)
+ 	hist.catch   <- c(rep(0,pre.fishery.yrs),CatchTot.err)
+ 	
+ 	# Set temporary constant catches
+ 	hist.catch   <- c(rep(0,pre.fishery.yrs), rep(1000, setup.yrs))
   }
 
 
 # Effort based catch alternative ------------------------------------------------------------------------------------------------
-  if ( !use_catch ){
- 	  effort  = numeric(0)
- 	  #Constant Effort
-    if (catchEQ == "constant") { 
-      effort[1:(ages - 1)] <- 0
-      effort[ages:(pre.fishery.yrs + setup.yrs)] <- 0.15
-    }
-  
-    #Ramp up
-    if (catchEQ == "ramp"){
-      effort[1:(ages - 1)] <- 0
-      ind <- ages:(pre.fishery.yrs + setup.yrs)
-      effort[ind] <- 0.50 * ((ind + 1 - (ages)) / length(ind) )
-    }
- 	  
-    #Ramp up and then constant effort
-    if (catchEQ == "ramp_constant"){
-      effort[1:(ages - 1)] <- 0
-      ind <- ages:(pre.fishery.yrs + setup.yrs - 24)
-      effort[ind] <- 0.40 * ((ind + 1 - (ages)) / length(ind) )
-      ind2 <- (max(ind)+1) : (pre.fishery.yrs + setup.yrs)
-      effort[ind2] <- 0.40
-    }
-  
-    #Ramp and Decline Effort
-    if (catchEQ == "ramp_decline"){
-      yr1 <- ages
-      yr2 <- ages + 15
-      effort[1:(ages - 1)] <- 0
-      effort[yr1: yr2] <- 0.50 * (yr1:yr2 - yr1 + 1) / (yr2 - yr1 + 1)
-      effort[(yr2 + 1):(yr2 + 20)] <- 0.50
-      yr1 <- yr2 + 21
-      yr2 <- (pre.fishery.yrs + setup.yrs)
-      effort[yr1:yr2] <- 0.50 * (0.80 * yr1 - yr2 + 0.20*(yr1:yr2)) / (yr1 - yr2)
-    }
+ if ( !use_catch ){
+ 	effort = hist.catch = numeric(0)
+ 	#Constant Effort
+  if (catchEQ == "constant") { 
+    effort[1:(ages - 1)] <- 0
+    effort[ages:(pre.fishery.yrs + setup.yrs)] <- 0.15
   }
+
+  #Ramp up
+  if (catchEQ == "ramp"){
+    effort[1:(ages - 1)] <- 0
+    ind <- ages:(pre.fishery.yrs + setup.yrs)
+    effort[ind] <- 0.50 * ((ind + 1 - (ages)) / length(ind) )
+  }
+ 	
+  #Ramp up and then constant effort
+  if (catchEQ == "ramp_constant"){
+    effort[1:(ages - 1)] <- 0
+    ind <- ages:(pre.fishery.yrs + setup.yrs - 24)
+    effort[ind] <- 0.40 * ((ind + 1 - (ages)) / length(ind) )
+    ind2 <- (max(ind)+1) : (pre.fishery.yrs + setup.yrs)
+    effort[ind2] <- 0.40
+  }
+
+  #Ramp and Decline Effort
+  if (catchEQ == "ramp_decline"){
+    yr1 <- ages
+    yr2 <- ages + 15
+    effort[1:(ages - 1)] <- 0
+    effort[yr1: yr2] <- 0.50 * (yr1:yr2 - yr1 + 1) / (yr2 - yr1 + 1)
+    effort[(yr2 + 1):(yr2 + 20)] <- 0.50
+    yr1 <- yr2 + 21
+    yr2 <- (pre.fishery.yrs + setup.yrs)
+    effort[yr1:yr2] <- 0.50 * (0.80 * yr1 - yr2 + 0.20*(yr1:yr2)) / (yr1 - yr2)
+  }
+ }
  
 
 # Starting population values -----------------------------------------------------------------------------------------------------
  R0 <- 1000
  if ( determ ) { R0 <- 10000 }
 
-# Draw recruitment deviations----------------------------------------------------------------------------------------------------- 
+ #Draw recruitment deviations----------------------------------------------------------------------------------------------------- 
  if ( determ ) { sigmaR = survey.cv = 0 ; sigmaR.set = 0.01 ; ss.survey.cv = 0.05 }
-
+ #sigmaR = sigmaR.set = 0.20 ; survey.cv = ss.survey.cv = 0.05
  set.seed(recruit.seed[nsim])
  rho      <- 0
  if ( auto ) { rho <- 1 / sqrt(2) }
@@ -194,12 +189,12 @@ for (nsim in start.n:end.n)
     autocorr[e] <- rho*autocorr[e-1]+sqrt(1-rho*rho)*recdevs[e] 
  }
  
-# Draw Survey Error---------------------------------------------------------------------------------------------------------------  
+ #Draw Survey Error---------------------------------------------------------------------------------------------------------------  
  set.seed(survey.seed[nsim])
  survey.err <<- rnorm(total.yrs, 0, survey.cv)
  
-# Recruits Spawning biomass  Vulnerable biomas------------------------------------------------------------------------------------
- Update_Dynamics <- function(R0, biology)
+ #Recruits Spawning biomass  Vulnerable biomas------------------------------------------------------------------------------------
+ Update_Dynamics <- function(R0, hist.catch, biology)
  {
     UpdateDyn <- list() 
     
@@ -217,48 +212,35 @@ for (nsim in start.n:end.n)
          
     for(y in 1:(pre.fishery.yrs+setup.yrs - 1)) {  
 
-      selec.age          <- biology$selec.age
-      #selec.age.f       <- biology$selec.age.f
-      selec              <- biology$selec
-   
-      f                  <- c(f.split[1] * effort[y], f.split[2] * effort[y])
-	    f.values[,y]       <- f
-      z.m                <- (1 - exp(-(m.m + selec.age[1,2,] * f[1] + selec.age[2,2,]*f[2]))) / 
-                              (m.m + selec.age[1,2,] * f[1] + selec.age[2,2,] * f[2])
-      z.f                <- (1 - exp(-(m.f + selec.age[1,1,] * f[1] + selec.age[2,1,] * f[2]))) / 
-                              (m.f + selec.age[1,1,] * f[1] + selec.age[2,1,] * f[2])
-      for (fleet in 1:f.fleets){
-        catch.at.age[y,fleet,,1] <- f[fleet] * (numbers[y,,1] * selec.age[fleet,1,]) * z.f
-        catch.at.age[y,fleet,,2] <- f[fleet] * (numbers[y,,2] * selec.age[fleet,2,]) * z.m
-      }
+      selec.age.m     <- biology$selec.age.m
+      selec.age.f     <- biology$selec.age.f
+      selec           <- biology$selec
+
+      f             <- effort[y]
+	    f.values[y]   <- f
+      z.m           <- (1 - exp(-(m.m + selec.age.m * f))) / (m.m + selec.age.m * f)
+      z.f           <- (1 - exp(-(m.f + selec.age.f * f))) / (m.f + selec.age.f * f)
+      catch.at.age[y,,1] <- f * (numbers[y,,1] * selec.age.f) * z.f
+      catch.at.age[y,,2] <- f * (numbers[y,,2] * selec.age.m) * z.m
 
       #Catch At Length
       mid.temp.f <- numbers[y,,1] * z.f 
-      mid.temp.m <- numbers[y,,2] * z.m
-
-      for (fleet in 1:f.fleets){
-        catch.at.len[y,fleet,,1] <- ((biology$mid.phi.f * selec[fleet,,1]) %*% (mid.temp.f))
-        catch.at.len[y,fleet,,2] <- ((biology$mid.phi.m * selec[fleet,,2]) %*% (mid.temp.m))
-      } 
-
-	    hist.catch[y,1] <- f[1] * (sum(biology$mid.wght.at.len[,1] * catch.at.len[y,1,,1]) +
-                                 sum(biology$mid.wght.at.len[,2] * catch.at.len[y,1,,2]) ) 
-
-      hist.catch[y,2] <- f[2] * (sum(biology$mid.wght.at.len[,1] * catch.at.len[y,2,,1]) +
-                                 sum(biology$mid.wght.at.len[,2] * catch.at.len[y,2,,2]) )   
+      mid.temp.m <- numbers[y,,2] * z.m 
+      catch.at.len[y,,1] <- ((biology$mid.phi.f * selec[,1]) %*% (mid.temp.f))
+      catch.at.len[y,,2] <- ((biology$mid.phi.m * selec[,2]) %*% (mid.temp.m))
+	    hist.catch[y] <- f * (sum(biology$mid.wght.at.len[,1] * catch.at.len[y,,1]) +
+                            sum(biology$mid.wght.at.len[,2] * catch.at.len[y,,2]) )  
         
       # survival at age by gender
-      S.f <- exp(-(m.f + selec.age[1,1,] * f[1] + selec.age[2,1,] * f[2]))
-      S.m <- exp(-(m.m + selec.age[1,2,] * f[1] + selec.age[2,2,] * f[2]))
+      S.f <- exp(-(m.f + selec.age.f * f))
+      S.m <- exp(-(m.m + selec.age.m * f))
         
       #Update the numbers and remove the catch by applying the solved for f value
       numbers[y+1, 2:ages, 1] <- numbers[y, 1:(ages-1), 1] * S.f[1:(ages-1)]
       numbers[y+1, 2:ages, 2] <- numbers[y, 1:(ages-1), 2] * S.m[1:(ages-1)]
-      #numbers[y+1, ages, 1]   <- numbers[y+1, ages, 1] + numbers[y, ages, 1] * exp(-m.f - selec.age.f[ages] * f)
-      #numbers[y+1, ages, 2]   <- numbers[y+1, ages, 2] + numbers[y, ages, 2] * exp(-m.m - selec.age.m[ages] * f)
-      numbers[y+1, ages, 1]   <- numbers[y+1, ages, 1] + numbers[y, ages, 1] * S.f[ages]
-      numbers[y+1, ages, 2]   <- numbers[y+1, ages, 2] + numbers[y, ages, 2] * S.m[ages]
-
+      numbers[y+1, ages, 1]   <- numbers[y+1, ages, 1] + numbers[y, ages, 1] * exp(-m.f - selec.age.f[ages] * f)
+      numbers[y+1, ages, 2]   <- numbers[y+1, ages, 2] + numbers[y, ages, 2] * exp(-m.m - selec.age.m[ages] * f)
+        
       SSB[y+1] <- sum(numbers[y+1, 2:ages, 1] * biology$fecund[2:ages])
   
       #Expected (and then realized) recruitment
@@ -269,37 +251,61 @@ for (nsim in start.n:end.n)
     } #closes yearly loop
     
     UpdateDyn[[1]] <- f.values
-    UpdateDyn[[2]] <- catch.wght.values <- hist.catch
+    UpdateDyn[[2]] <- catch.wght.values
     UpdateDyn[[3]] <- catch.at.age
     UpdateDyn[[4]] <- catch.at.len
     UpdateDyn[[5]] <- numbers
     UpdateDyn[[6]] <- SSB
     UpdateDyn[[7]] <- Ry
     UpdateDyn[[8]] <- selec
-    UpdateDyn[[9]] <- selec.age
-    UpdateDyn[[10]]<- hist.catch
+    UpdateDyn[[9]] <- selec.age.f
+    UpdateDyn[[10]]<- selec.age.m
+    UpdateDyn[[11]]<- NULL#caa
+    UpdateDyn[[12]]<- hist.catch
     names(UpdateDyn) <- c("f.values","catch.wght.values","catch.at.age","catch.at.len","numbers","SSB","Ry", "selec", 
-                    "selec.age", "hist.catch")
+                    "selec.age.f", "selec.age.m", "caa", "hist.catch")
     return(UpdateDyn)
  }
 
 #=================================================================================================================================
 
+ #Objective Function to solve for R0
+ #Test.R0 <- function(R0) {
+ #    SSB<- Update_Dynamics(R0, hist.catch, biology = cmp_bio())$SSB
+ #    obj.fun <- (SSB[pre.fishery.yrs + setup.yrs] / SSB[1] - final.depl)^2
+ #    return(obj.fun) 
+ #}
+
+ #Find R0 that results in the correct depletion level
+ #start.time <- Sys.time()
+ #r0.value   <- optimize(Test.R0, interval = c(low.bound, upper.bound))
+ #end.time   <- Sys.time()
+ #R0         <- r0.value$minimum
+ #end.time   <- Sys.time()
+ #print(end.time-start.time)
+
  # Create Virgin population
- dyn      <- Update_Dynamics(R0, biology = Get_Biology())
+ dyn      <- Update_Dynamics(R0, hist.catch, biology = Get_Biology())
  Dyn      <- list() 
  Dyn[[1]] <- dyn$numbers
  Dyn[[2]] <- dyn$SSB
  Dyn[[3]] <- dyn$Ry
  Dyn[[4]] <- dyn$SSB / dyn$SSB[1]
  Dyn[[5]] <- dyn$f.values
- Dyn[[6]] <- dyn$catch.at.age
- Dyn[[7]] <- dyn$catch.at.len
- Dyn[[8]] <- dyn$selec
- Dyn[[9]] <- dyn$selec.age
- Dyn[[10]]<- dyn$catch.wght.values
- names(Dyn) <- c("numbers", "SSB", "Ry", "Depl", "f.values", "catch.at.age", "catch.at.len",
-                  "selec", "selec.age", "catch.wght.values") 
+ Dyn[[6]] <- dyn$z.rate
+ Dyn[[7]] <- NULL#dyn$catch.wght.values
+ Dyn[[8]] <- dyn$catch.at.age
+ Dyn[[9]] <- dyn$catch.at.len
+ Dyn[[10]]<- dyn$selec
+ Dyn[[11]]<- dyn$selec.age.f
+ Dyn[[12]]<- dyn$selec.age.m
+ Dyn[[13]]<- dyn$caa
+ Dyn[[14]]<- dyn$hist.catch
+ names(Dyn) <- c("numbers", "SSB", "Ry", "Depl", "f.values", "z.rate", "catch.wght.values", "catch.at.age", "catch.at.len",
+                  "selec", "selec.age.f", "selec.age.m", "caa", "hist.catch")
+ #rm(dyn) 
+
+ hist.catch <- dyn$hist.catch
 
 #Format Data ----------------------------------------------------------------------------------------------------------
  #Get the survey data from the start of the survey until year 50
@@ -320,7 +326,7 @@ for (nsim in start.n:end.n)
  #Survey Data
  for (a in start.s.data:(pre.fishery.yrs + setup.yrs - 1)) {
      #Format the survey data for sampling
-     ind <- y           <- a
+     ind                <- a
      survey.catch.len   <- cbind(apply(survey.catch.age.len[ind,,,1],2,sum), apply(survey.catch.age.len[ind,,,2], 2, sum))
      survey.catch.age   <- cbind(apply(survey.catch.age.len[ind,,,1],1,sum), apply(survey.catch.age.len[ind,,,2], 1, sum))
    
@@ -332,60 +338,54 @@ for (nsim in start.n:end.n)
  }
  
  # Fishery Data
-  for (fleet in 1:f.fleets){
-    for (a in start.f.data[fleet]:(pre.fishery.yrs + setup.yrs - 1)) {
-        ind                     <- a
-        f.lengths[fleet,ind,]   <- Multinom_Lengths(catch.type = catch.at.len[ind,fleet,,], len.samp = f.len.samp[ind,fleet]) 
-        age.out                 <- Multinom_Ages(catch.type = catch.at.age[ind,fleet,,], age.samp = f.age.samp[ind,fleet] , AgeError)
-        f.a.ca[fleet,ind,]      <- age.out
-        f.sample.size[fleet,ind]<- sum(age.out)
-     }
+ for (a in start.f.data:(pre.fishery.yrs + setup.yrs - 1)) {
+     ind                <- a
+     f.lengths[ind,]    <- Multinom_Lengths(catch.type = catch.at.len[ind,,], len.samp = f.len.samp[ind]) 
+     
+     age.out            <- Multinom_Ages(catch.type = catch.at.age[ind,,], age.samp = f.age.samp[ind] , AgeError)
+     f.a.ca[ind,]       <- age.out
+     f.sample.size[ind] <- sum(age.out)
  }
 
  #Format the data for SS
  SS.survey.data      <<- cbind(survey.dur, 
                                rep(1, length(survey.dur)),
-                               rep(f.fleets + 1, length(survey.dur)), 
+                               rep(2, length(survey.dur)), 
                                survey.proj[survey.dur], 
                                rep(ss.survey.cv, 
                                length(survey.dur))) 
 
- fishery.length.data <- fishery.age.data <- NULL
- for (fleet in 1:f.fleets){
-    f.data.dur = start.f.data[fleet]:(pre.fishery.yrs + setup.yrs - 1)
-    temp                <- cbind(f.data.dur, 
+ f.data.dur = start.f.data:(pre.fishery.yrs + setup.yrs - 1)
+ fishery.length.data <<- cbind(f.data.dur, 
                                rep(1, length(f.data.dur)), 
-                               rep(fleet, length(f.data.dur)), 
+                               rep(1, length(f.data.dur)), 
                                rep(3, length(f.data.dur)),
                                rep(2, length(f.data.dur)), 
-                               f.len.samp[f.data.dur, fleet], 
-                               f.lengths[fleet, f.data.dur, ])
-    fishery.length.data <<- rbind(fishery.length.data, temp)
+                               f.len.samp[f.data.dur], 
+                               f.lengths[f.data.dur, ])
 
-    temp                <- cbind(f.data.dur, 
-                               rep(1, length(f.data.dur)), 
-                               rep(fleet, length(f.data.dur)), 
-                               rep(3, length(f.data.dur)), 
-                               rep(0, length(f.data.dur)), 
-                               rep(1, length(f.data.dur)), 
-                               rep(-1, length(f.data.dur)), 
-                               rep(-1, length(f.data.dur)),
-                               f.sample.size[fleet, f.data.dur], 
-                               f.a.ca[fleet,f.data.dur, ])
-    fishery.age.data   <<- rbind(fishery.age.data, temp)
- }
- 
  survey.length.data  <<- cbind(survey.dur, 
                                rep(1, length(survey.dur)), 
-                               rep(f.fleets + 1, length(survey.dur)), 
+                               rep(2, length(survey.dur)), 
                                rep(3, length(survey.dur)),
                                rep(2, length(survey.dur)), 
                                s.len.samp[survey.dur], 
                                s.lengths[survey.dur, ])
 
+ fishery.age.data    <<- cbind(f.data.dur, 
+                               rep(1, length(f.data.dur)), 
+                               rep(1, length(f.data.dur)), 
+                               rep(3, length(f.data.dur)), 
+                               rep(0, length(f.data.dur)), 
+                               rep(1, length(f.data.dur)), 
+                               rep(-1, length(f.data.dur)), 
+                               rep(-1, length(f.data.dur)),
+                               f.sample.size[f.data.dur], 
+                               f.a.ca[f.data.dur, ])
+
  survey.age.data     <<- cbind(survey.dur, 
                                rep(1, length(survey.dur)), 
-                               rep(f.fleets + 1, length(survey.dur)), 
+                               rep(2, length(survey.dur)), 
                                rep(3, length(survey.dur)), 
                                rep(0, length(survey.dur)), 
                                rep(1, length(survey.dur)), 
@@ -410,57 +410,47 @@ for (nsim in start.n:end.n)
  Ry                <- Dyn$Ry
  catch.at.age      <- Dyn$catch.at.age
  catch.at.len      <- Dyn$catch.at.len
- #catch.wght.values <- Dyn$catch.wght.values
- selec.age         <- Dyn$selec.age
- selec             <- biology$selec
  catch.wght.values <- Dyn$catch.wght.values
+ selec.age.m       <- Dyn$selec.age.m
+ selec.age.f       <- Dyn$selec.age.f
+ selec             <- biology$selec
  
  #Pull in values from the original survey year
+ #vul.total.obs[survey.dur]     <- survey.out$temp.vul.total
  index.expect[survey.dur]      <- survey.out$temp.index
  
  true.ofl          <- numeric(fishery.yrs)
  true.f            <- numeric(fishery.yrs)
- #fore.catch        <- numeric(total.yrs)
- fore.catch[1:(pre.fishery.yrs + setup.yrs)] <- 0 #hist.catch[1:(pre.fishery.yrs + setup.yrs),]
+ fore.catch        <- numeric(total.yrs)
+ fore.catch[1:(pre.fishery.yrs + setup.yrs)] <- hist.catch[1:(pre.fishery.yrs + setup.yrs)]
  
  counter = 0
  decl.overfished = FALSE
  rerun = 0
  overfished.counter = 0
 
- #Find F values based on  catch-----------------------------------------------------------------------------------------------------
+ #Find F values based on catch-----------------------------------------------------------------------------------------------------
  Findf <- function(f){
-
-    z.m                <- (1 - exp(-(m.m + selec.age[1,2,] * f.split[1] * f + selec.age[2,2,] * f.split[2] * f))) / 
-                                    (m.m + selec.age[1,2,] * f.split[1] * f + selec.age[2,2,] * f.split[2] * f)
-    z.f                <- (1 - exp(-(m.f + selec.age[1,1,] * f.split[1] * f + selec.age[2,1,] * f.split[2] * f))) / 
-                                    (m.f + selec.age[1,1,] * f.split[1] * f + selec.age[2,1,] * f.split[2] * f)
-
-    catch.at.age.f <- cbind( f.split[1] * f * (numbers[y,,1] * selec.age[1,1,]) * z.f, 
-                             f.split[2] * f * (numbers[y,,1] * selec.age[2,1,]) * z.f )
-
-    catch.at.age.m <- cbind( f.split[1] * f * (numbers[y,,2] * selec.age[1,2,]) * z.m, 
-                             f.split[2] * f * (numbers[y,,2] * selec.age[2,2,]) * z.m)
-
+    z.m <- (1 - exp(-(m.m + selec.age.m * f))) / (m.m + selec.age.m * f)
+    z.f <- (1 - exp(-(m.f + selec.age.f * f))) / (m.f + selec.age.f * f)
+    #Catch at Age
+    catch.at.age.f <- f * (numbers[y,,1] * selec.age.f) * z.f
+    catch.at.age.m <- f * (numbers[y,,2] * selec.age.m) * z.m
     #Catch At Length
-    mid.temp.f <- numbers[y,,1] * z.f 
+    mid.temp.f <- numbers[y,,1] * z.f
     mid.temp.m <- numbers[y,,2] * z.m
 
-    catch.at.len.f <- cbind( ((biology$mid.phi.f * selec[1,,1]) %*% (mid.temp.f)), 
-                             ((biology$mid.phi.f * selec[2,,1]) %*% (mid.temp.f)) ) 
-
-    catch.at.len.m <- cbind( ((biology$mid.phi.m * selec[1,,2]) %*% (mid.temp.m)), 
-                             ((biology$mid.phi.m * selec[2,,2]) %*% (mid.temp.m)) ) 
-
-    catch.wght     <- c( f.split[1] * f * (sum(biology$mid.wght.at.len[,1] * catch.at.len.f[,1]) +
-                                           sum(biology$mid.wght.at.len[,2] * catch.at.len.m[,1]) ), 
-                         f.split[2] * f * (sum(biology$mid.wght.at.len[,1] * catch.at.len.f[,2]) +
-                                           sum(biology$mid.wght.at.len[,2] * catch.at.len.m[,2]) ) )   
+    catch.at.len.f <- ((biology$mid.phi.f * selec[,1]) %*% (mid.temp.f))
+    catch.at.len.m <- ((biology$mid.phi.m * selec[,2]) %*% (mid.temp.m))
+        
+    #Catch in Weight by Sex, mid.wght (41X2) calculated in the GetWght() function  
+    catch.wght <- f * (sum(biology$mid.wght.at.len[,1] * catch.at.len.f) +
+                       sum(biology$mid.wght.at.len[,2] * catch.at.len.m))    
  
     output <- NULL
-    output$catch.wght     <- catch.wght
     output$catch.at.len.f <- catch.at.len.f
     output$catch.at.len.m <- catch.at.len.m
+    output$catch.wght     <- catch.wght
     output$catch.at.age.f <- catch.at.age.f
     output$catch.at.age.m <- catch.at.age.m
     return(output)
@@ -468,7 +458,7 @@ for (nsim in start.n:end.n)
  
  #Objective Function----------------------------------------------------------------------------------------------------------
  Obj.Fun.F <- function(f) {
-    obj.fun.f <- (sum(Findf(f)$catch.wght) - fore.catch[y])^2
+    obj.fun.f <- (Findf(f)$catch.wght - fore.catch[y])^2
     return(obj.fun.f) 
  }
   
@@ -481,7 +471,7 @@ for (nsim in start.n:end.n)
         writeStarter(starter = "starter.ss")
         writeForecast(forecast = "forecast.ss", y = y)
         writeCtl(ctl, y = y)
-        writeDat(dat, y = y, fore.catch = catch.wght.values)
+        writeDat(dat, y = y, fore.catch = fore.catch)
         
         #Read in the Report File to run the bias ramp code 
         if (y <= (pre.fishery.yrs + setup.yrs + 9)) {
@@ -519,12 +509,7 @@ for (nsim in start.n:end.n)
             	main.rec.end <- y #last.bias - 1
             	converge     <- new.bias$newbias$message
             }
-
-            # Data Weighting
-            # f.age.wght = as.numeric(SSMethod.TA1.8(rep.bias, type ='age', fleet = 1, part = 0, pick.gender = 3)[1])
-            # f.age.wght = min(round(f.age.wght,2), 1)
-            # s.age.wght = as.numeric(SSMethod.TA1.8(rep.bias, type ='age', fleet = 2, part = 0, pick.gender = 3)[1])
-            # s.age.wght = min(round(s.age.wght,2), 1)     
+                 
         }      
         
         if (y > (pre.fishery.yrs + setup.yrs + 9)){
@@ -544,10 +529,6 @@ for (nsim in start.n:end.n)
         file.copy("sim.dat", paste(directory,"/ctl/sim.dat",sep =""))
         file.rename(paste(directory,"/ctl/sim.dat",sep =""), 
                     paste(directory,"/ctl/sim",nsim,"_",y,".dat",sep =""))   
-
-        file.copy("Report.sso", paste(directory,"/report/Report.sso",sep =""))
-        file.rename(paste(directory,"/report/Report.sso",sep =""), 
-                    paste(directory,"/report/Report",nsim,"_",y,".sso",sep ="")) 
         
         rep.new   <- readLines(paste(directory, "Report.sso", sep=""))
         gradiant  <- as.numeric(strsplit(rep.new[grep(paste("Convergence_Level",sep=""),rep.new)]," ")[[1]][2])
@@ -575,17 +556,14 @@ for (nsim in start.n:end.n)
         OFL[y:(y+ass.freq - 1)]     <- rep.out$OFL
         ForeCat[y:(y+ass.freq - 1)] <- rep.out$ForeCatch
         FSPR[,counter]              <- rep.out$FSPR
+        #Fmult[,counter]            <- fmult
         m.store[,counter]           <- rep.out$M
         lmin.store[,counter]        <- rep.out$Lmin
         lmax.store[,counter]        <- rep.out$Lmax
         k.store[,counter]           <- rep.out$k
         R0.out[,counter]            <- rep.out$R0
-        f.selex[1,1,,counter]       <- rep.out$f.selex[,1]
-        f.selex[2,1,,counter]       <- rep.out$f.selex[,2]
-        f.selex[1,2,,counter]       <- rep.out$f.selex.m[,1]
-        f.selex[2,2,,counter]       <- rep.out$f.selex.m[,2]
-        s.selex[1,,counter]         <- rep.out$s.selex
-        s.selex[2,,counter]         <- rep.out$s.selex.m
+        f.selex[,counter]           <- rep.out$f.selex
+        s.selex[,counter]           <- rep.out$s.selex
         ind                         <- y #- pre.fishery.yrs
         SB[1:ind,counter]           <- rep.out$SB
         Bratio[1:ind,counter]       <- rep.out$Depl
@@ -606,15 +584,13 @@ for (nsim in start.n:end.n)
         Est[[13]]<- lmin.store
         Est[[14]]<- lmax.store
         Est[[15]]<- k.store
-        Est[[16]]<- m.store
 
         names(Est) <- c("OFL","ForeCat","FSPR","m.store","R0.out","SB","Bratio","f.selex","s.selex","Recruits",
-                          "Gradiant.out", "rerun", "lmin.store", "lmax.store", "k.store", "m.store")
+                          "Gradiant.out", "rerun", "lmin.store", "lmax.store", "k.store")
         save(Est, file=estimates)  
         
         #Pull the ACL from the Report File and use that for the next two years 
         fore.catch[y:(y + ass.freq - 1)]         <- rep.out$ForeCatch 
-        #temp.catch         <- rep.out$ForeCatch
         
       } #Close the assessment loop  
    
@@ -650,26 +626,24 @@ for (nsim in start.n:end.n)
 
 
     #Determine the F value from the estimated ACL      
-    f.total               <- optimize(Obj.Fun.F, lower = 0, upper = 2)$minimum  
-    find.f                <- Findf(f.total)
-    f.values[,y]          <- f <- f.total * f.split
-    for (fleet in 1:f.fleets){
-      catch.at.age[y,fleet,,1]   <- find.f$catch.at.age.f[,fleet]
-      catch.at.age[y,fleet,,2]   <- find.f$catch.at.age.m[,fleet]
-      catch.at.len[y,fleet,,1]   <- find.f$catch.at.len.f[,fleet]
-      catch.at.len[y,fleet,,2]   <- find.f$catch.at.len.m[,fleet]
-    }
-    catch.wght.values[y,] <- find.f$catch.wght 
+    f                    <- optimize(Obj.Fun.F, lower = 0, upper = 2)$minimum  
+    f.values[y]          <- f 
+    find.f               <- Findf(f)
+    catch.at.age[y,,1]   <- find.f$catch.at.age.f
+    catch.at.age[y,,2]   <- find.f$catch.at.age.m
+    catch.at.len[y,,1]   <- find.f$catch.at.len.f
+    catch.at.len[y,,2]   <- find.f$catch.at.len.m
+    catch.wght.values[y] <- find.f$catch.wght
          
     # survival at age by gender
-    S.f                  <- exp(-(m.f + selec.age[1,1,] * f[1] + selec.age[2,1,] * f[2]))
-    S.m                  <- exp(-(m.m + selec.age[1,2,] * f[1] + selec.age[2,2,] * f[2]))
+    S.f                  <- exp(-(m.f + selec.age.f * f))
+    S.m                  <- exp(-(m.m + selec.age.m * f))
       
     #Update the numbers and remove the catch by applying the solved for f value
     numbers[y+1, 2:ages, 1] <- numbers[y, 1:(ages-1), 1] * S.f[1:(ages-1)]
     numbers[y+1, 2:ages, 2] <- numbers[y, 1:(ages-1), 2] * S.m[1:(ages-1)]
-    numbers[y+1, ages, 1]   <- numbers[y+1, ages, 1] + numbers[y, ages, 1] * S.f[ages]
-    numbers[y+1, ages, 2]   <- numbers[y+1, ages, 2] + numbers[y, ages, 2] * S.m[ages]
+    numbers[y+1, ages, 1]   <- numbers[y+1, ages, 1] + numbers[y, ages, 1] * exp(-m.f - selec.age.f[ages] * f)
+    numbers[y+1, ages, 2]   <- numbers[y+1, ages, 2] + numbers[y, ages, 2] * exp(-m.m - selec.age.m[ages] * f)
       
     SSB[y+1] <- max(0, sum(numbers[y+1, 2:ages, 1] * biology$fecund[2:ages]))
 
@@ -689,7 +663,7 @@ for (nsim in start.n:end.n)
     #Format data for SS 
     SS.survey.data <- cbind(survey.dur, 
                             rep(1, length(survey.dur)),
-                            rep(f.fleets + 1, length(survey.dur)), 
+                            rep(2, length(survey.dur)), 
                             survey.proj[survey.dur], 
                             rep(ss.survey.cv, 
                             length(survey.dur))) 
@@ -697,57 +671,49 @@ for (nsim in start.n:end.n)
     #Get Composition Data    
     survey.catch.len  <- cbind(apply(survey.catch.age.len[y,,,1],2,sum), apply(survey.catch.age.len[y,,,2], 2, sum))
     survey.catch.age  <- cbind(apply(survey.catch.age.len[y,,,1],1,sum), apply(survey.catch.age.len[y,,,2], 1, sum))
-    # Survey Comp Data
+
+    f.lengths[y,]     <- Multinom_Lengths(catch.type = catch.at.len[y,,], len.samp = f.len.samp[y]) 
     s.lengths[y,]     <- Multinom_Lengths(catch.type = survey.catch.len,    len.samp = s.len.samp[y])
+    age.out           <- Multinom_Ages(catch.type = catch.at.age[y,,],    age.samp = f.age.samp[y], AgeError)
+    f.a.ca[y,]        <- age.out
+    f.sample.size[y]  <- sum(age.out)
     age.out           <- Multinom_Ages(catch.type = survey.catch.age, age.samp = s.age.samp[y], AgeError) 
     s.a.ca[y,]        <- age.out
     s.sample.size[y]  <- sum(age.out)
-    # Fishery Comp Data
-    for(fleet in 1:f.fleets){
-      f.lengths[fleet,y,]     <- Multinom_Lengths(catch.type = catch.at.len[y,fleet,,], len.samp = f.len.samp[y,fleet]) 
-      age.out                 <- Multinom_Ages(catch.type = catch.at.age[y,fleet,,],    age.samp = f.age.samp[y,fleet], AgeError)
-      f.a.ca[fleet,y,]        <- age.out
-      f.sample.size[fleet, y] <- sum(age.out)
-    }
-     
+ 
     #Format the data for SS
-    # Fishery Data
-    fishery.length.data <- fishery.age.data <- NULL
-    for (fleet in 1:f.fleets){
-      f.data.dur <- start.f.data[fleet]:y
-      temp              <- cbind(f.data.dur, 
-                                 rep(1, length(f.data.dur)), 
-                                 rep(fleet, length(f.data.dur)), 
-                                 rep(3, length(f.data.dur)),
-                                 rep(2, length(f.data.dur)), 
-                                 f.len.samp[f.data.dur,fleet], 
-                                 f.lengths[fleet, f.data.dur, ])
-      fishery.length.data <<- rbind(fishery.length.data, temp)
-
-      temp              <- cbind(f.data.dur, 
-                                 rep(1, length(f.data.dur)), 
-                                 rep(fleet, length(f.data.dur)), 
-                                 rep(3, length(f.data.dur)), 
-                                 rep(0, length(f.data.dur)), 
-                                 rep(1, length(f.data.dur)), 
-                                 rep(-1,length(f.data.dur)), 
-                                 rep(-1, length(f.data.dur)),
-                                 f.age.samp[f.data.dur,fleet], 
-                                 f.a.ca[fleet,f.data.dur, ])
-      fishery.age.data <<- rbind(fishery.age.data, temp)
-    }
+    f.data.dur <- start.f.data:y
+    fishery.length.data <<- cbind(f.data.dur, 
+                                  rep(1, length(f.data.dur)), 
+                                  rep(1, length(f.data.dur)), 
+                                  rep(3, length(f.data.dur)),
+                                  rep(2, length(f.data.dur)), 
+                                  f.len.samp[f.data.dur], 
+                                  f.lengths[f.data.dur, ])
 
     survey.length.data  <<- cbind(survey.dur, 
                                   rep(1, length(survey.dur)), 
-                                  rep(f.fleets + 1, length(survey.dur)), 
+                                  rep(2, length(survey.dur)), 
                                   rep(3, length(survey.dur)),
                                   rep(2, length(survey.dur)), 
                                   s.len.samp[survey.dur], 
                                   s.lengths[survey.dur, ]) 
 
+    f.data.dur <- start.f.data:y
+    fishery.age.data    <<- cbind(f.data.dur, 
+                                  rep(1, length(f.data.dur)), 
+                                  rep(1, length(f.data.dur)), 
+                                  rep(3, length(f.data.dur)), 
+                                  rep(0, length(f.data.dur)), 
+                                  rep(1, length(f.data.dur)), 
+                                  rep(-1,length(f.data.dur)), 
+                                  rep(-1, length(f.data.dur)),
+                                  f.age.samp[f.data.dur], 
+                                  f.a.ca[f.data.dur, ])
+
     survey.age.data     <<- cbind(survey.dur, 
                                   rep(1, length(survey.dur)), 
-                                  rep(f.fleets + 1, length(survey.dur)), 
+                                  rep(2, length(survey.dur)), 
                                   rep(3, length(survey.dur)), 
                                   rep(0, length(survey.dur)), 
                                   rep(1, length(survey.dur)), 
@@ -776,10 +742,12 @@ for (nsim in start.n:end.n)
     Proj[[15]]<- f.age.samp
     Proj[[16]]<- s.age.samp
     Proj[[17]]<- selec
-    Proj[[18]]<- selec.age
+    Proj[[18]]<- selec.age.f
+    Proj[[19]]<- selec.age.m
 
     names(Proj) <- c("f.values", "catch.wght.values", "catch.at.age", "catch.at.len", "numbers", "SSB", "depl","Ry", "index.expect",
-                "fore.catch","true.ofl", "true.f","f.len.samp","s.len.sam","f.age.samp","s.age.samp", "selec", "selec.age")
+                "fore.catch","true.ofl", "true.f","f.len.samp","s.len.sam","f.age.samp","s.age.samp", "selec", "selec.age",
+                "selec.age.m")
     save(Proj, file=projections)  
         
    } #closes yearly projection loop

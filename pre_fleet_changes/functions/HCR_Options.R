@@ -28,7 +28,7 @@ if (hcr.opt == "hcr_30_10" ){
 }
 
 # Alternative 2
-if (hcr.opt == "hcr_20_5" ){
+if (hcr.opt == "hcr_20_05" ){
 	spr.target     <- 0.25         
 	bio.target     <- 0.20
 	ctl.rule.tgt   <- 0.20

@@ -40,19 +40,49 @@ Rep_Summary<- function(rep.new, y)
   cv.young.m<- as.numeric(strsplit(rep.new[grep("CV_young_Mal",rep.new)], " ")[[1]][3])
   cv.old.m  <- as.numeric(strsplit(rep.new[grep("CV_old_Mal",rep.new)], " ")[[1]][3 ])
 
-  #Selectivity
-  f.selex.1 <- as.numeric(strsplit(rep.new[grep("SizeSel_1P_1_Fishery",rep.new)], " ")[[1]][3])
-  f.selex.2 <- as.numeric(strsplit(rep.new[grep("SizeSel_1P_2_Fishery",rep.new)], " ")[[1]][3])
-  f.selex.3 <- as.numeric(strsplit(rep.new[grep("SizeSel_1P_3_Fishery",rep.new)], " ")[[1]][3])
-  f.selex.4 <- as.numeric(strsplit(rep.new[grep("SizeSel_1P_4_Fishery",rep.new)], " ")[[1]][3])
-  f.selex.5 <- as.numeric(strsplit(rep.new[grep("SizeSel_1P_5_Fishery",rep.new)], " ")[[1]][3])
-  f.selex.6 <- as.numeric(strsplit(rep.new[grep("SizeSel_1P_6_Fishery",rep.new)], " ")[[1]][3])
-  s.selex.1 <- as.numeric(strsplit(rep.new[grep("SizeSel_2P_1_Survey",rep.new)], " ")[[1]][3])
-  s.selex.2 <- as.numeric(strsplit(rep.new[grep("SizeSel_2P_2_Survey",rep.new)], " ")[[1]][3])
-  s.selex.3 <- as.numeric(strsplit(rep.new[grep("SizeSel_2P_3_Survey",rep.new)], " ")[[1]][3])
-  s.selex.4 <- as.numeric(strsplit(rep.new[grep("SizeSel_2P_4_Survey",rep.new)], " ")[[1]][3])
-  s.selex.5 <- as.numeric(strsplit(rep.new[grep("SizeSel_2P_5_Survey",rep.new)], " ")[[1]][3])
-  s.selex.6 <- as.numeric(strsplit(rep.new[grep("SizeSel_2P_6_Survey",rep.new)], " ")[[1]][3])
+  # Females
+  if (f.fleets > 1){
+    f.selex.1 <- c(as.numeric(strsplit(rep.new[grep("SizeSel_1P_1_Fishery1",rep.new)], " ")[[1]][3]),
+                   as.numeric(strsplit(rep.new[grep("SizeSel_2P_1_Fishery2",rep.new)], " ")[[1]][3]) )
+    f.selex.2 <- c(as.numeric(strsplit(rep.new[grep("SizeSel_1P_2_Fishery1",rep.new)], " ")[[1]][3]),
+                   as.numeric(strsplit(rep.new[grep("SizeSel_2P_2_Fishery2",rep.new)], " ")[[1]][3]))
+    f.selex.3 <- c(as.numeric(strsplit(rep.new[grep("SizeSel_1P_3_Fishery1",rep.new)], " ")[[1]][3]),
+                   as.numeric(strsplit(rep.new[grep("SizeSel_2P_3_Fishery2",rep.new)], " ")[[1]][3]) )
+    f.selex.4 <- c(as.numeric(strsplit(rep.new[grep("SizeSel_1P_4_Fishery1",rep.new)], " ")[[1]][3]),
+                   as.numeric(strsplit(rep.new[grep("SizeSel_2P_4_Fishery2",rep.new)], " ")[[1]][3]))
+    f.selex.5 <- c(as.numeric(strsplit(rep.new[grep("SizeSel_1P_5_Fishery1",rep.new)], " ")[[1]][3]),
+                   as.numeric(strsplit(rep.new[grep("SizeSel_2P_5_Fishery2",rep.new)], " ")[[1]][3]))
+    f.selex.6 <- c(as.numeric(strsplit(rep.new[grep("SizeSel_1P_6_Fishery1",rep.new)], " ")[[1]][3]),
+                   as.numeric(strsplit(rep.new[grep("SizeSel_2P_6_Fishery2",rep.new)], " ")[[1]][3]))
+  }
+
+  # Males
+  if (f.fleets > 1){
+    f.selex.m.1 <- c(as.numeric(strsplit(rep.new[grep("SzSel_1Male_Peak_Fishery1",rep.new)], " ")[[1]][3]),
+                     as.numeric(strsplit(rep.new[grep("SzSel_2Male_Peak_Fishery2",rep.new)], " ")[[1]][3]) )
+    f.selex.m.3 <- c(as.numeric(strsplit(rep.new[grep("SzSel_1Male_Ascend_Fishery1",rep.new)], " ")[[1]][3]),
+                     as.numeric(strsplit(rep.new[grep("SzSel_2Male_Ascend_Fishery2",rep.new)], " ")[[1]][3]))
+    f.selex.m.4 <- c(as.numeric(strsplit(rep.new[grep("SzSel_1Male_Descend_Fishery1",rep.new)], " ")[[1]][3]),
+                     as.numeric(strsplit(rep.new[grep("SzSel_2Male_Descend_Fishery2",rep.new)], " ")[[1]][3]) )    
+    f.selex.m.6 <- c(as.numeric(strsplit(rep.new[grep("SzSel_1Male_Final_Fishery1",rep.new)], " ")[[1]][3]),
+                     as.numeric(strsplit(rep.new[grep("SzSel_2Male_Final_Fishery2",rep.new)], " ")[[1]][3]))
+    f.selex.m.2 <- c("NA", "NA")
+    f.selex.m.5 <- c("NA", "NA")
+  }
+  
+  s.selex.1 <- as.numeric(strsplit(rep.new[grep("SizeSel_3P_1_Survey",rep.new)], " ")[[1]][3])
+  s.selex.2 <- as.numeric(strsplit(rep.new[grep("SizeSel_3P_2_Survey",rep.new)], " ")[[1]][3])
+  s.selex.3 <- as.numeric(strsplit(rep.new[grep("SizeSel_3P_3_Survey",rep.new)], " ")[[1]][3])
+  s.selex.4 <- as.numeric(strsplit(rep.new[grep("SizeSel_3P_4_Survey",rep.new)], " ")[[1]][3])
+  s.selex.5 <- as.numeric(strsplit(rep.new[grep("SizeSel_3P_5_Survey",rep.new)], " ")[[1]][3])
+  s.selex.6 <- as.numeric(strsplit(rep.new[grep("SizeSel_3P_6_Survey",rep.new)], " ")[[1]][3])
+
+  s.selex.m.1 <- as.numeric(strsplit(rep.new[grep("SzSel_3Male_Peak_Survey",rep.new)], " ")[[1]][3])
+  s.selex.m.3 <- as.numeric(strsplit(rep.new[grep("SzSel_3Male_Ascend_Survey",rep.new)], " ")[[1]][3])
+  s.selex.m.4 <- as.numeric(strsplit(rep.new[grep("SzSel_3Male_Descend_Survey",rep.new)], " ")[[1]][3])
+  s.selex.m.6 <- as.numeric(strsplit(rep.new[grep("SzSel_3Male_Final_Survey",rep.new)], " ")[[1]][3])
+  s.selex.m.2 <- "NA"
+  s.selex.m.5 <- "NA"
   
   Depl = SB/SB.virgin
   
@@ -64,12 +94,18 @@ Rep_Summary<- function(rep.new, y)
   RepSummary$ForeCatch <- ForeCatch
   RepSummary$Depl      <- Depl
   RepSummary$FSPR      <- FSPR
-  RepSummary$f.selex   <- c(f.selex.1, 
-                            f.selex.2, 
-                            f.selex.3, 
-                            f.selex.4, 
-                            f.selex.5, 
-                            f.selex.6)
+  RepSummary$f.selex   <- rbind(f.selex.1, 
+                                f.selex.2, 
+                                f.selex.3, 
+                                f.selex.4, 
+                                f.selex.5, 
+                                f.selex.6)
+  RepSummary$f.selex.m <- rbind(f.selex.m.1, 
+                                f.selex.m.2, 
+                                f.selex.m.3, 
+                                f.selex.m.4, 
+                                f.selex.m.5, 
+                                f.selex.m.6)
   RepSummary$R0        <- R0
   RepSummary$s.selex   <- c(s.selex.1, 
                             s.selex.2, 
@@ -77,6 +113,12 @@ Rep_Summary<- function(rep.new, y)
                             s.selex.4, 
                             s.selex.5, 
                             s.selex.6)
+  RepSummary$s.selex.m <- c(s.selex.m.1, 
+                            s.selex.m.2, 
+                            s.selex.m.3, 
+                            s.selex.m.4, 
+                            s.selex.m.5, 
+                            s.selex.m.6)
   RepSummary$M          <- cbind(M.f,M.m)
   RepSummary$Recruits   <- Recruits
   RepSummary$Lmin       <- cbind(Lmin.f, Lmin.m)
