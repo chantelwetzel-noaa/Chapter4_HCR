@@ -11,9 +11,9 @@
 #source("//even_more_home//h_cwetzel//PhD//Flatfish_MSC//code//Flatfish_HCR_MSE.R") 
 #drive   <-"//home//cwetzel//h_cwetzel//PhD"
 drive   <-"C:" #"//home//cwetzel//h_cwetzel"
-start.n <- 184
-end.n   <- 200
-hcr.opt <- "hcr_20_5"
+start.n <- 101
+end.n   <- 101
+hcr.opt <- "hcr_30_10"
 #HCR Options: 25_5; 40_10; 30_10; 20_5
 steep     <- 0.85
 steep.set <- 0.75
@@ -491,6 +491,7 @@ for (nsim in start.n:end.n)
             rep.new   <- readLines(paste(directory, "Report.sso", sep=""))
             gradiant  <- as.numeric(strsplit(rep.new[grep(paste("Convergence_Level",sep=""),rep.new)]," ")[[1]][2])
             virgin.SB <- as.numeric(strsplit(rep.new[grep(paste("SPB_Virgin",sep=""),rep.new)]," ")[[1]][3])
+
             while(virgin.SB < (SSB0/4) || virgin.SB > (SSB0*4)) {
               rerun = rerun + 1  
               starter.file = SS_readstarter(paste(directory, "starter.ss", sep = ""))
@@ -505,8 +506,16 @@ for (nsim in start.n:end.n)
               }
               if(rerun > 2) { break () }
             }
+
+            if (rerun > 2){
+              if (tantalus == T) { system("./SS3 -nohess > test.txt 2>&1")  }
+              if (tantalus == F) { shell("ss3.exe -nohess > test.txt 2>&1")  }
+              last.bias    <- y - 3 
+              last.no.bias <- y - 2 
+              main.rec.end <- y 
+            }
             
-            if ( !determ ){
+            if ( !determ & rerun <= 2){
             	#Read model and rump bias ramp adjustment function
             	rep.bias     <- SS_output(directory, covar = TRUE, printstats = FALSE, forecast = FALSE)
             	new.bias     <- SS_fitbiasramp(rep.bias, 
