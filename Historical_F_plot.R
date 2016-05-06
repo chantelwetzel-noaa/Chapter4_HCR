@@ -15,11 +15,16 @@ effort[ind2] <- 0.40
 fishery1 = 0.75 * effort
 fishery2 = 0.25 * effort
 
+setwd("C:/Flatfish_MSC/WriteUp/Plots")
+png(filename = "HistF.png", width = 3.5, height = 4.5, units = 'in', res = 256)
+
 par(mfrow = c(1,1))
 plot(1:50, fishery1[ages:(ages + 49)], type = 'l', lwd = 2, ylim = c(0,0.50), axes = F, ylab = "", xlab="", yaxs = 'i', xaxs = "i")
 lines(1:50, fishery2[ages:(ages + 49)], lty = 2, lwd = 2)
 box()
-axis(side = 1); axis(side = 2)
-mtext(side=1,"Year",line=3, cex=1.1)
-mtext(side=2,"Historical F Pattern",line=3, cex=1.1)
-legend("topright", legend = c("Fishery 1", "Fishery 2"), lty = c(1,2), lwd = c(2,2), bty = 'n', cex = 1.1)
+axis(side = 1); axis(side = 2, las = 1)
+mtext(side=1,"Year",line=3, cex=1)
+mtext(side=2,"Historical F Pattern",line=3, cex=1)
+legend("topright", legend = c("Fishery 1", "Fishery 2"), lty = c(1,2), lwd = c(2,2), bty = 'n', cex = 1)
+
+dev.off()

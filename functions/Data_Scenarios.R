@@ -29,7 +29,7 @@ s.age.wght = f.age.wght = 1
 
 # Survey and Sigma R parameters
 Q            <- 3 #1
-sigmaR 	     <- sigmaR.set <- 0.40  
+#sigmaR 	     <- sigmaR.set <- 0.40  
 ss.survey.cv <- survey.cv  <- 0.20
 
 # Model dimensions
@@ -54,6 +54,14 @@ start.survey.len.samp  <- start.survey.age.samp  <- start.s.data
 # Fishery data availability by fleet
 N.f.len = c(50, 30) ;  N.f.age = c(25, 15)  
 N.s.len = 50 ; N.s.age = 50 
+
+# Data reduction sensitivity
+if( reduce.data ){
+	N.f.len = c(25, 30) ;  N.f.age = c(12, 15)  
+	N.s.len = 25 ; N.s.age = 25
+	ss.survey.cv <- survey.cv  <- 0.30
+}
+
 # Create the sample number vectors
 f.len.samp <- f.age.samp <- matrix(0, total.yrs, f.fleets)
 

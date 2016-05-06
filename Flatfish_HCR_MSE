@@ -11,16 +11,18 @@
 #source("//even_more_home//h_cwetzel//PhD//Flatfish_MSC//code//Flatfish_HCR_MSE.R") 
 #drive   <-"//home//cwetzel//h_cwetzel//PhD"
 drive   <-"C:" #"//home//cwetzel//h_cwetzel"
-start.n <- 101
-end.n   <- 101
-hcr.opt <- "hcr_30_10"
+start.n <- 1
+end.n   <- 200
+hcr.opt <- "hcr_20_5"
 #HCR Options: 25_5; 40_10; 30_10; 20_5
 steep     <- 0.85
-steep.set <- 0.75
+steep.set <- 0.85
+sigmaR    <- 0.60
 auto      <- FALSE
+reduce.data <- FALSE
 
 tantalus <- FALSE
-github   <- FALSE
+github   <- TRUE
 
 NSIM      <- end.n
 seed.list <- list()
@@ -37,9 +39,11 @@ require( compiler )
 require( r4ss )
 
 #Set the directory 
-if (steep == steep.set){ directory <-  paste0(drive, "/Flatfish_MSC/Steep_", steep*100, "/") }
-if (steep != steep.set){ directory <-  paste0(drive, "/Flatfish_MSC/Steep_", steep*100, "_", steep.set*100,"/")}
-if (steep == steep.set & auto == TRUE) { directory <-  paste0(drive, "/Flatfish_MSC/Steep_", steep*100,"_auto", "/") }
+if (steep == steep.set){ directory <-  paste0(drive, "/PhD/Chapter4/Steep_", steep*100, "/") }
+if (steep == steep.set  & sigmaR == 0.60){ directory <-  paste0(drive, "/PhD/Chapter4/Steep_", steep*100, "_sigmaR_", sigmaR*100,"/") }
+if (steep != steep.set){ directory <-  paste0(drive, "/PhD/Chapter4/Steep_", steep*100, "_", steep.set*100,"/")}
+if (steep == steep.set & auto == TRUE ) { directory <-  paste0(drive, "/PhD/Chapter4/Steep_", steep*100,"_auto", "/") }
+if (steep == steep.set & auto == TRUE & sigmaR == 0.60) { directory <-  paste0(drive, "/PhD/Chapter4/Steep_", steep*100,"_sigmaR_", sigmaR*100,"_auto", "/") }
 dir.create(directory)
 directory <<- paste0(directory, "hcr_option_", hcr.opt,"_", catchEQ, "_sims_",start.n,"_",end.n,"/")
 dir.create(directory)
@@ -49,26 +53,26 @@ dir.create(paste(directory,"/report", sep=""))
 
  #Move the executable to the correct folder to run simulations
  if (!tantalus) {
-  	file.copy(paste(drive,"/Flatfish_MSC/ss3.exe",sep=""),paste(directory,"/ss3.exe",sep="")) }
+  	file.copy(paste(drive,"/PhD/Chapter4/ss3.exe",sep=""),paste(directory,"/ss3.exe",sep="")) }
  if (tantalus)  {
-    file.copy(paste(drive,"/Flatfish_MSC/SS3",sep=""),paste(directory,"/SS3",sep="")) }
+    file.copy(paste(drive,"/PhD/Chapter4/SS3",sep=""),paste(directory,"/SS3",sep="")) }
  
  #Source in external functions
  if (github) { 
-  	git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Flatfish_MSC/"
+  	git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Chapter4_HCR/"
   	source(paste(drive, git.wd, "functions/Functions.R", sep = "")) }
  if (!github){ 
- 	source(paste(drive,"/Flatfish_MSC/code/functions/Functions.R",sep="")) }
+ 	source(paste(drive,"/PhD/Chapter4/code/functions/Functions.R",sep="")) }
 
 #---------------------------------------------------------------------------------------------------
 for (nsim in start.n:end.n)
  {
   
   if (github) { 
-    git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Flatfish_MSC/"
+    git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Chapter4_HCR/"
     source(paste(drive, git.wd, "functions/Functions.R", sep = ""))  }
   if (!github){ 
-    source(paste(drive,"/Flatfish_MSC/code/functions/Functions.R",sep="")) }
+    source(paste(drive,"/PhD/Chapter4/code/functions/Functions.R",sep="")) }
 
   #Save Output
   projections <- paste(directory,"save/om_proj_",nsim,sep="")
@@ -77,7 +81,7 @@ for (nsim in start.n:end.n)
   ctl   	    <- paste0("sim",".ctl")
   
   #Read in the seeds 
-  load(paste(drive,"/Flatfish_MSC/seed_list",sep=""))
+  load(paste(drive,"/PhD/Chapter4/seed_list",sep=""))
   recruit.seed  <- as.numeric(seed.list[[1]][,"recruit.seed"])
   catch.seed    <- as.numeric(seed.list[[1]][,"catch.seed"])
   survey.seed   <- as.numeric(seed.list[[1]][,"survey.seed"])
@@ -86,7 +90,7 @@ for (nsim in start.n:end.n)
   select.seed   <- as.numeric(seed.list[[1]][,"spare2"])
 
   # Read in the parameter lsit and set according to simulation
-  load(paste(drive,"/Flatfish_MSC/parm_dist_list",sep=""))
+  load(paste(drive,"/PhD/Chapter4/parm_dist_list",sep=""))
   m.f <- parm.list$m.f[[nsim]]
   m.m <- parm.list$m.m[[nsim]]
   kf  <- parm.list$kf[[nsim]]

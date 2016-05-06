@@ -48,5 +48,3 @@ ssp = matrix(NA, 2, 6)
 ssp[1,] = c(42, 3,   5, 14, -999, -999) #survey females
 ssp[2,] = c(36, 3, 4.5, 14, -999, -999)
  
-#Solved using put code name here
-Fmsy <- 0.25 # DUMMY VALUE!!!!!!!!!!!!!!!!!!!!!!   

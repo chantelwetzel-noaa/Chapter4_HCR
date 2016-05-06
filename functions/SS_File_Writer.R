@@ -81,7 +81,7 @@ writeCtl <- function (ctl,y)
     0,      1,          0,            0,                    -1,         99,    -99,       c(rep(0,4), 0.5, 0, 0), "# CohortGrowDev"), 
     ncol=15, byrow=T)
 
-    sigma.set = ifelse(sigmaR == 0, 0.01, sigmaR)
+    sigmaR.set = ifelse(sigmaR == 0, 0.01, sigmaR)
     rec.mat <- matrix(c(
     #_LO    HI     INIT                 PRIOR       PR_type      SD       PHASE
     2,      15,    round(log(R0),3),    round(log(R0),3),    -1,         10,      1, "# log(R0)",  
