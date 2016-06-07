@@ -1,13 +1,16 @@
 N = 200
 
 f.val <- seq(0, 4, 0.01)
-bmsy = numeric(0)
-max.spr = numeric(0)
+bmsy = msy = max.spr = numeric(0)
 depl = matrix(NA, length(f.val), N)
 catch = matrix(NA, length(f.val), N)
 
-steep = 0.75
-for (nsim in 1:N) {
+steep.vec = c(0.85, 0.75, 0.95)
+for (s in 1:length(steep.vec))
+{
+	steep = steep.vec[s]
+
+	for (nsim in 1:N) {
     drive = "C:"
     github = TRUE
     git.wd = "/Users/Chantell.Wetzel/Documents/GitHub/Chapter4_HCR"
@@ -15,7 +18,7 @@ for (nsim in 1:N) {
     source(paste0(drive, git.wd, "/functions/LH_parameters.R"))
     source(paste0(drive, git.wd, "/functions/Get_Biology.R"))
 
-    R0 = 10000
+    R0 = 1000
     project <- 50
     
     f.fleets = 2
@@ -154,6 +157,7 @@ for (nsim in 1:N) {
 
 	ind  <- sort(catch.store[project - 1,], index.return = TRUE ) 
 	bmsy[nsim] <- ssb.fraction[ind$ix[length(f.val)]]
+	msy[nsim] <- catch.store[(project-1),ind$ix[length(f.val)]]
 	ypr  <- catch.store[project -1,] / (R0/2) 
 	bot = ssb.store[1,] / ry.store[1,]
 	top = ssb.store[project,] / ry.store[project,]
@@ -168,10 +172,13 @@ for (nsim in 1:N) {
 quants <- paste0(drive,"/PhD/Chapter4/Steep_", 100*steep,"/quants_", 100*steep)
 Out <- list()
 Out$bmsy <- bmsy
+Out$msy  <- msy
 Out$max.spr <- max.spr
 Out$depl <- depl
 Out$catch <- catch
 save(Out, file = quants)
+}
+
 
 	#par(mfrow = c(2,2))
 	#plot(ssb.fraction, catch.store[project - 1,], xlim = c(0,1))

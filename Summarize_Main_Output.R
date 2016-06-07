@@ -10,9 +10,11 @@
 
 
 drive = "C:"
-sim.range = c(1,200)
+sim.range = c(1, 200)
 
-steep.vec <- c("Steep_85", "Steep_75", "Steep_95", "Steep_85_75", "Steep_85_95", "Steep_85_auto")
+steep.vec <- c("Steep_85", "Steep_75", "Steep_95", 
+				"Steep_85_75", "Steep_85_95", "Steep_85_data_30",
+				"Steep_85_sigmaR_60","Steep_85_auto","Steep_85_auto_sigmaR_60")
 hcr.vec   <- c( "hcr_20_5_ramp_constant",
 				"hcr_25_5_ramp_constant", 
 				"hcr_30_10_ramp_constant", 
@@ -22,10 +24,11 @@ for (a in 1:length(steep.vec)){
 
 	# Dimensions by Steepness  ===============================================================
 	#code.dir = paste("C:/Flatfish_MSC/code", sep = "")
+	reduce.data = FALSE
 	code.dir = paste("C:/Users/Chantell.Wetzel/Documents/GitHub/Chapter4_HCR/", sep = "")
 	source(paste(code.dir,"/functions/LH_parameters.R",sep = ""))
 	source(paste(code.dir,"/functions/Data_Scenarios.R",sep = ""))
-	load("C:/Flatfish_MSC/parm_dist_list")
+	load("C:/PhD/Chapter4/parm_dist_list")
 	# The specific years an assessment was performed
 	ass.yrs      = seq(ages + setup.yrs - 1, total.yrs, ass.freq) 
 	# Years to summarize the performance over
@@ -70,12 +73,24 @@ for (a in 1:length(steep.vec)){
     med.ssb      <- array(0, dim = c(length(hcr.vec), total.yrs, 3))
 	med.depl     <- array(0, dim = c(length(hcr.vec), total.yrs, 3))
 	med.rec      <- array(0, dim = c(length(hcr.vec), total.yrs, 3))
+	re.ssb       <- array(0, dim = c(length(hcr.vec), length(sum.yrs), sim.range[2] - sim.range[1] + 1))
+	re.depl      <- array(0, dim = c(length(hcr.vec), length(sum.yrs), sim.range[2] - sim.range[1] + 1))
 	re.m 		 <- array(0, dim = c(length(hcr.vec), 2, ass.num, sim.range[2] - sim.range[1] + 1))
 	re.k		 <- array(0, dim = c(length(hcr.vec), 2, ass.num, sim.range[2] - sim.range[1] + 1))
 	re.lmax		 <- array(0, dim = c(length(hcr.vec), 2, ass.num, sim.range[2] - sim.range[1] + 1))
+	prop.catch   <- array(0, dim = c(length(hcr.vec), length(sum.yrs), sim.range[2] - sim.range[1] + 1))
+	prop.msy     <- array(0, dim = c(length(hcr.vec), length(sum.yrs), sim.range[2] - sim.range[1] + 1))
+
+	if (steep.vec[a] == "Steep_85") { load("C:/PhD/Chapter4/Steep_85/quants_85") ; msy.85 <- Out$msy }
+	if (steep.vec[a] == "Steep_75") { load("C:/PhD/Chapter4/Steep_75/quants_75") ; msy.75 <- Out$msy }
+	if (steep.vec[a] == "Steep_95") { load("C:/PhD/Chapter4/Steep_95/quants_95") ; msy.95 <- Out$msy }
+
+	msy  <- Out$msy 
+	bmsy <- Out$bmsy
+	spr  <- Out$max.spr
 	
 	for(b in 1:length(hcr.vec)){
-		dir = paste(drive,"/Flatfish_MSC/",steep.vec[a], "/hcr_option_", hcr.vec[b], "_sims_", sim.range[1], "_", sim.range[2], sep = "")
+		dir = paste(drive,"/PhD/Chapter4/",steep.vec[a], "/hcr_option_", hcr.vec[b], "_sims_", sim.range[1], "_", sim.range[2], sep = "")
 
 		for(c in sim.range[1]:sim.range[2]){
 			# Operating Model
@@ -110,18 +125,22 @@ for (a in 1:length(steep.vec)){
 			med.rec.est [b,ind,d,] <- t(apply(rec.est [b,ind,d,], 1, quantile, quant.vec))
 		}
 
-		# Calculate relative errors================================================================
+		# Calculate relative errors==================================================================
 		for(c in sim.range[1]:sim.range[2]){
-			re.m[b,1,,c] = (parm.list$m.f[[c]] - m.est[b,1,,c]) / parm.list$m.f[[c]]
-			re.m[b,2,,c] = (parm.list$m.m[[c]] - m.est[b,2,,c]) / parm.list$m.m[[c]]
-			re.k[b,1,,c] = (parm.list$kf[[c]]  - k.est[b,1,,c]) / parm.list$kf[[c]] 
-			re.k[b,2,,c] = (parm.list$km[[c]]  - k.est[b,2,,c]) / parm.list$km[[c]] 
-			re.lmax[b,1,,c] = (parm.list$L2f[[c]] - lmax.est[b,1,,c]) / parm.list$L2f[[c]]
-			re.lmax[b,2,,c] = (parm.list$L2m[[c]] - lmax.est[b,2,,c]) / parm.list$L2m[[c]]
+			re.m[b,1,,c] = (m.est[b,1,,c] - parm.list$m.f[[c]]) / parm.list$m.f[[c]]
+			re.m[b,2,,c] = (m.est[b,2,,c] - parm.list$m.m[[c]]) / parm.list$m.m[[c]]
+			re.k[b,1,,c] = (k.est[b,1,,c] - parm.list$kf[[c]] ) / parm.list$kf[[c]] 
+			re.k[b,2,,c] = (k.est[b,2,,c] - parm.list$km[[c]] ) / parm.list$km[[c]] 
+			re.lmax[b,1,,c] = (lmax.est[b,1,,c] - parm.list$L2f[[c]]) / parm.list$L2f[[c]]
+			re.lmax[b,2,,c] = (lmax.est[b,2,,c] - parm.list$L2m[[c]]) / parm.list$L2m[[c]]
+		}
+
+		for(c in sim.range[1]:sim.range[2]){
+			re.ssb[b,,c]  = (ssb.est[b,sum.yrs,ass.num,c]  - ssb[b,sum.yrs,c])  / ssb[b,sum.yrs,c]
+			re.depl[b,,c] = (depl.est[b,sum.yrs,ass.num,c] - depl[b,sum.yrs,c]) / depl[b,sum.yrs,c]
 		}
 
 		# Calculate performance metrics ===========================================================
-
 		for(c in sim.range[1]:sim.range[2]){
 			# AAV over the summary period
 			abs.catch = mapply(function(x) abs(acl.est[b,x-1,c] - acl.est[b,x,c]), x = sum.yrs)
@@ -131,6 +150,20 @@ for (a in 1:length(steep.vec)){
 			# Total catch over the summary period
 		    catch.sum[b,c] = sum.catch.by.sim		    
 		}	
+
+		# Calculate the proportion of the MSY attained by each hcr ==================================
+		for (c in sim.range[1]:sim.range[2]){
+			prop.msy[b,,c] = ofl.est[b,sum.yrs,c] / msy.85[c]
+			if (steep.vec[a] == "Steep_75" ) { prop.msy[b,,c] = ofl.est[b,sum.yrs,c] / msy.75[c] }
+			if (steep.vec[a] == "Steep_95" ) { prop.msy[b,,c] = ofl.est[b,sum.yrs,c] / msy.95[c] }			
+		}
+
+		for (c in sim.range[1]:sim.range[2]){
+			prop.catch[b,,c] = acl.est[b,sum.yrs,c] / (msy.85[c] * buffer)
+			if (steep.vec[a] == "Steep_75" ) { prop.catch[b,,c] = acl.est[b,sum.yrs,c] / (msy.75[c] * buffer)}
+			if (steep.vec[a] == "Steep_95" ) { prop.catch[b,,c] = acl.est[b,sum.yrs,c] / (msy.95[c] * buffer)}			
+		}
+
 
 		# Average catch over simulations
 		catch.ave[b,] = catch.sum[b,]/length(sum.yrs)
@@ -202,15 +235,18 @@ for (a in 1:length(steep.vec)){
 
 	om.all <- ss.all <- hcr.all <- med.all <-  list()
 
-	om.out 	<- paste0(drive,"/Flatfish_MSC/output/", steep.vec[a], "_om_all")
-	ss.out 	<- paste0(drive,"/Flatfish_MSC/output/", steep.vec[a], "_ss_all")
-	hcr.out <- paste0(drive,"/Flatfish_MSC/output/", steep.vec[a], "_hcr_all")
-	med.out <- paste0(drive,"/Flatfish_MSC/output/", steep.vec[a], "_medians_all")
+	om.out 	<- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_om_all")
+	ss.out 	<- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_ss_all")
+	hcr.out <- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_hcr_all")
+	med.out <- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_medians_all")
 
 	om.all$ssb  <- ssb
 	om.all$depl <- depl
 	om.all$rec  <- rec
 	om.all$catch<- catch
+	om.all$msy  <- msy
+	om.all$bmsy <- bmsy
+	om.all$spr  <- spr
 	save(om.all, file = om.out)
 
 	ss.all$ssb.est 	<- ssb.est
@@ -234,6 +270,8 @@ for (a in 1:length(steep.vec)){
 	hcr.all$target.20.est  <- target.20.est
 	hcr.all$target.20.true <- target.20.true
 	hcr.all$quant.vec      <- quant.vec
+	hcr.all$prop.msy       <- prop.msy
+	hcr.all$prop.catch     <- prop.catch
 	save(hcr.all, file = hcr.out)
 
 	med.all$med.ssb	    <- med.ssb
@@ -245,5 +283,7 @@ for (a in 1:length(steep.vec)){
 	med.all$re.m        <- re.m
 	med.all$re.k        <- re.k
 	med.all$re.lmax     <- re.lmax
+	med.all$re.ssb      <- re.ssb
+	med.all$re.depl     <- re.depl
 	save(med.all, file = med.out)
 }

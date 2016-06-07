@@ -11,14 +11,14 @@
 #source("//even_more_home//h_cwetzel//PhD//Flatfish_MSC//code//Flatfish_HCR_MSE.R") 
 #drive   <-"//home//cwetzel//h_cwetzel//PhD"
 drive   <-"C:" #"//home//cwetzel//h_cwetzel"
-start.n <- 1
-end.n   <- 200
+start.n <- 97
+end.n   <- 97
 hcr.opt <- "hcr_20_5"
 #HCR Options: 25_5; 40_10; 30_10; 20_5
 steep     <- 0.85
 steep.set <- 0.85
 sigmaR    <- 0.60
-auto      <- FALSE
+auto      <- TRUE
 reduce.data <- FALSE
 
 tantalus <- FALSE
@@ -26,7 +26,7 @@ github   <- TRUE
 
 NSIM      <- end.n
 seed.list <- list()
-determ    <- FALSE
+determ    <- TRUE
 use_catch <- FALSE
 catchEQ   <- "ramp_constant"
 

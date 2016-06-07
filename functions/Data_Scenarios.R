@@ -56,10 +56,11 @@ N.f.len = c(50, 30) ;  N.f.age = c(25, 15)
 N.s.len = 50 ; N.s.age = 50 
 
 # Data reduction sensitivity
+# original reduction was done by 50% with CV = 0.30
 if( reduce.data ){
-	N.f.len = c(25, 30) ;  N.f.age = c(12, 15)  
-	N.s.len = 25 ; N.s.age = 25
-	ss.survey.cv <- survey.cv  <- 0.30
+	N.f.len = floor(0.30 * N.f.len) ;  N.f.age = floor(0.30 * N.f.age)
+	N.s.len = floor(0.30 * N.s.len) ;  N.s.age = floor(0.30 * N.s.age)
+	ss.survey.cv <- survey.cv  <- 0.35 
 }
 
 # Create the sample number vectors

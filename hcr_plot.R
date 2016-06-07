@@ -37,31 +37,37 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925),...) {   #... means any new
 }
 
 setwd("C:/PhD/Chapter4/WriteUp/Plots")
-png(filename = "HCR.png", width = 6.7, height = 6, units = 'in', res = 256)
+png(filename = "HCR_2.png", width = 6.7, height = 6, units = 'in', res = 256)
 par(mfrow = c(2,2), mar = rep(0.50, 4), oma = c(3,3,3,3))
-abc.col = "grey71"; ofl.col = 1 ; t.col = "grey63"
+ofl.col = 1; abc.col = 'grey50' ; t.col = "grey63"; acl.col = 1
 # 20-05 ==========================================================
 low = 0.05; high = 0.20; f = 0.25
 out <- yield(low, high, f); z1 = out$z1 ; z2 = out$z2
 plot(seq(high,1, step), out$ofl[z2:length(out$ofl)],,type='l',ylim=c(0, 20),xlim=c(0,0.50),
      axes=F,ylab="",xlab="",xaxs="i",yaxs="i", lwd=2, cex.axis=1.2, col = ofl.col)
 box()
-lines(seq(low,high,step), out$ofl.hcr, lty = 1, lwd = 2, col = ofl.col)
+#lines(seq(low,high,step), out$ofl.hcr, lty = 1, lwd = 2, col = ofl.col)
 #lines(seq(0,1,step), out$ofl, lty = 4, col = ofl.col)
+lines(seq(0,1,step), out$ofl, lty = 1, lwd = 2, col = ofl.col)
 # abc
-lines(seq(high,1,step), out$abc[z2:length(out$abc)], lty = 1, lwd = 2, col = abc.col)
+lines(seq(high,1,step), out$abc[z2:length(out$abc)], lty = 1, lwd = 1, col = abc.col)
+lines(seq(0,1,step), out$abc, lty = 1, lwd = 2, col = abc.col)
 #lines(seq(0,1,step), out$abc, lty = 4, lwd = 1, col = abc.col)
-lines(seq(low,high,step), out$abc.hcr, lty = 1, lwd = 2, col = abc.col)
+#lines(seq(low,high,step), out$abc.hcr, lty = 2, lwd = 2, col = abc.col)
 lines(rep(low, 2), c(0, 20), lty = 3, col = t.col)
 lines(rep(high, 2), c(0, 20), lty = 3, col = t.col)
+# acl 
+lines(seq(high,1,step), out$abc[z2:length(out$abc)]-0.10, lty = 2, lwd = 2, col = acl.col)
+lines(seq(low,high,step), out$abc.hcr, lty = 2, lwd = 2, col = acl.col)
+
 #lines(rep(low, 2), c(0, out$ofl[z1]), lty = 3, col = t.col)
 #lines(rep(high, 2), c(0, out$ofl[z2]), lty = 3, col = t.col)
 #abline(v = high, lty = 3, col = t.col); abline(v = low, lty = 3, col = t.col)
 #axis(side=1,at=seq(0.1,0.40,.1), labels=c("0.10", "0.20", "0.30", "0.40"), cex.axis = 1)
 print.letter(label = "(a)", xy = c(0.05, 0.92), cex = 1)
-mtext(side=1,"Relative Spawning Biomass",line=2, cex=1, outer = T)
-legend("topright", bty ='n', lty = c(1,1), col = c(ofl.col, abc.col), lwd = c(2,2), cex = 1,
-	legend = c("OFL", "ABC = OFL * Buffer"))
+mtext(side=1,"Relative Biomass",line=2, cex=1, outer = T)
+legend("topright", bty ='n', lty = c(1,1, 2), col = c(ofl.col, abc.col, acl.col), lwd = c(2,2,2), cex = 1,
+	legend = c(expression("OFL ="~F[MSY]~"*SB"), "ABC = OFL * Buffer", "ACL"))
 
 # 25-5 ==========================================================
 low = 0.05; high = 0.25; f=0.30
@@ -69,14 +75,19 @@ out <- yield(low, high, f); z1 = out$z1 ; z2 = out$z2
 plot(seq(high,1, step), out$ofl[z2:length(out$ofl)],,type='l',ylim=c(0, 20),xlim=c(0,0.50),
      axes=F,ylab="",xlab="",xaxs="i",yaxs="i",lwd=2,cex.axis=1.2, col=ofl.col)
 box()
-lines(seq(low,high,step), out$ofl.hcr, lty = 1, lwd = 2, col = ofl.col)
+#lines(seq(low,high,step), out$ofl.hcr, lty = 1, lwd = 2, col = ofl.col)
 #lines(seq(0,1,step), out$ofl, lty = 4, col = ofl.col)
+lines(seq(0,1,step), out$ofl, lty = 1, lwd = 2, col = ofl.col)
 # abc
-lines(seq(high,1,step), out$abc[z2:length(out$abc)], lty = 1, lwd = 2, col = abc.col)
+lines(seq(high,1,step), out$abc[z2:length(out$abc)], lty = 1, lwd = 1, col = abc.col)
+lines(seq(0,1,step), out$abc, lty = 1, lwd = 2, col = abc.col)
 #lines(seq(0,1,step), out$abc, lty = 4, lwd = 1, col = abc.col)
-lines(seq(low,high,step), out$abc.hcr, lty = 1, lwd = 2, col = abc.col)
+#lines(seq(low,high,step), out$abc.hcr, lty = 2, lwd = 2, col = abc.col)
 lines(rep(low, 2), c(0, 20), lty = 3, col = t.col)
 lines(rep(high, 2), c(0, 20), lty = 3, col = t.col)
+# acl 
+lines(seq(high,1,step), out$abc[z2:length(out$abc)]-0.10, lty = 2, lwd = 2, col = acl.col)
+lines(seq(low,high,step), out$abc.hcr, lty = 2, lwd = 2, col = acl.col)
 #lines(rep(low, 2), c(0, out$ofl[z1]), lty = 3, col = t.col)
 #lines(rep(high, 2), c(0, out$ofl[z2]), lty = 3, col = t.col)
 #axis(side=1,at=seq(0.1,0.40,.1), labels=c("0.10", "0.20", "0.30", "0.40"), cex.axis = 1)
@@ -89,19 +100,24 @@ out <- yield(low, high, f); z1 = out$z1 ; z2 = out$z2
 plot(seq(high,1, step), out$ofl[z2:length(out$ofl)],,type='l',ylim=c(0, 20),xlim=c(0,0.50),
      axes=F,ylab="",xlab="",xaxs="i",yaxs="i",lwd=2,cex.axis=1.2, col = ofl.col)
 box()
-lines(seq(low,high,step), out$ofl.hcr, lty = 1, lwd = 2, col = ofl.col)
+#lines(seq(low,high,step), out$ofl.hcr, lty = 1, lwd = 2, col = ofl.col)
 #lines(seq(0,1,step), out$ofl, lty = 4, col = ofl.col)
+lines(seq(0,1,step), out$ofl, lty = 1, lwd = 2, col = ofl.col)
 # abc
-lines(seq(high,1,step), out$abc[z2:length(out$abc)], lty = 1, lwd = 2, col = abc.col)
+lines(seq(high,1,step), out$abc[z2:length(out$abc)], lty = 1, lwd = 1, col = abc.col)
+lines(seq(0,1,step), out$abc, lty = 1, lwd = 2, col = abc.col)
 #lines(seq(0,1,step), out$abc, lty = 4, lwd = 1, col = abc.col)
+#lines(seq(low,high,step), out$abc.hcr, lty = 2, lwd = 2, col = abc.col)
 lines(rep(low, 2), c(0, 20), lty = 3, col = t.col)
 lines(rep(high, 2), c(0, 20), lty = 3, col = t.col)
-lines(seq(low,high,step), out$abc.hcr, lty = 1, lwd = 2, col = abc.col)
+# acl 
+lines(seq(high,1,step), out$abc[z2:length(out$abc)]-0.10, lty = 2, lwd = 2, col = acl.col)
+lines(seq(low,high,step), out$abc.hcr, lty = 2, lwd = 2, col = acl.col)
 #lines(rep(low, 2), c(0, out$ofl[z1]), lty = 3, col = t.col)
 #lines(rep(high, 2), c(0, out$ofl[z2]), lty = 3, col = t.col)
 #abline(v = high, lty = 3, col = t.col); abline(v = low, lty = 3, col = t.col)
 axis(side=1,at=seq(0,0.4,.1), labels=c("0.00", "0.10", "0.20", "0.30", "0.40"), cex.axis = 1)
-mtext(side=2,"Catch",line=1, cex=1, outer = T)
+mtext(side=2,"ACL",line=1, cex=1, outer = T)
 print.letter(label = "(d)", xy = c(0.05, 0.92), cex = 1)
 
 # 40-10 ==========================================================
@@ -110,14 +126,19 @@ out <- yield(low, high, f); z1 = out$z1 ; z2 = out$z2
 plot(seq(high,1, step), out$ofl[z2:length(out$ofl)],,type='l',ylim=c(0, 20),xlim=c(0,0.50),
      axes=F,ylab="",xlab="",xaxs="i",yaxs="i",lwd=2,cex.axis=1.2, col = ofl.col)
 box()
-lines(seq(low,high,step), out$ofl.hcr, lty = 1, lwd = 2, col = ofl.col)
+#lines(seq(low,high,step), out$ofl.hcr, lty = 1, lwd = 2, col = ofl.col)
 #lines(seq(0,1,step), out$ofl, lty = 4, col = ofl.col)
+lines(seq(0,1,step), out$ofl, lty = 1, lwd = 2, col = ofl.col)
 # abc
-lines(seq(high,1,step), out$abc[z2:length(out$abc)], lty = 1, lwd = 2, col = abc.col)
+lines(seq(high,1,step), out$abc[z2:length(out$abc)], lty = 1, lwd = 1, col = abc.col)
+lines(seq(0,1,step), out$abc, lty = 1, lwd = 2, col = abc.col)
 #lines(seq(0,1,step), out$abc, lty = 4, lwd = 1, col = abc.col)
-lines(seq(low,high,step), out$abc.hcr, lty = 1, lwd = 2, col = abc.col)
+#lines(seq(low,high,step), out$abc.hcr, lty = 2, lwd = 2, col = abc.col)
 lines(rep(low, 2), c(0, 20), lty = 3, col = t.col)
 lines(rep(high, 2), c(0, 20), lty = 3, col = t.col)
+# acl 
+lines(seq(high,1,step), out$abc[z2:length(out$abc)]-0.10, lty = 2, lwd = 2, col = acl.col)
+lines(seq(low,high,step), out$abc.hcr, lty = 2, lwd = 2, col = acl.col)
 #lines(rep(low, 2), c(0, out$ofl[z1]), lty = 3, col = t.col)
 #lines(rep(high, 2), c(0, out$ofl[z2]), lty = 3, col = t.col)
 axis(side=1,at=seq(0,0.40,.1), labels=c("0.00","0.10", "0.20", "0.30", "0.40"), cex.axis = 1)
