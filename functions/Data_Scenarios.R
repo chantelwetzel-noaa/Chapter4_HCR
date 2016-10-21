@@ -19,17 +19,33 @@ survey.time  <- 0.5
 fishing.time <- -1        
 max.F 		 <- 4 
 
+# Shift fishery selectivity for senstivitiy 
+if (fish.sel.mat){
+	fsp = array(NA, dim=c(2, 2, 6))
+	fsp[1,1,] = c(37,  3,  3, 14, -999, -999) #fishery 1 females
+	fsp[1,2,] = c(37,  3,  3, 14, -999, -999) #fishery 1 males
+	fsp[2,1,] = c(36,  3,  3, 14, -999, -999) #fishery 2 females
+	fsp[2,2,] = c(36,  3,  3, 14, -999, -999) #fishery 2 males
+}
+
+# Shift fishery selectivity for senstivitiy 
+if (fish.sel.pre){
+	fsp = array(NA, dim=c(2, 2, 6))
+	fsp[1,1,] = c(33,  3,  3, 14, -999, -999) #fishery 1 females
+	fsp[1,2,] = c(33,  3,  3, 14, -999, -999) #fishery 1 males
+	fsp[2,1,] = c(33,  3,  3, 14, -999, -999) #fishery 2 females
+	fsp[2,2,] = c(33,  3,  3, 14, -999, -999) #fishery 2 males
+}
+
 # Swith to apply the ageing error matrix
 AgeError <- TRUE
 #Adjust the max age value that would be used if ageing error is included
 max.age = ages - 1
 max.age = 40
-#if(AgeError == TRUE) { max.age  <- ages + 4  }  
 s.age.wght = f.age.wght = 1
 
 # Survey and Sigma R parameters
-Q            <- 3 #1
-#sigmaR 	     <- sigmaR.set <- 0.40  
+Q            <- 3 
 ss.survey.cv <- survey.cv  <- 0.20
 
 # Model dimensions

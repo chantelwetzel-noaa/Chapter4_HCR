@@ -11,15 +11,17 @@
 #source("//even_more_home//h_cwetzel//PhD//Flatfish_MSC//code//Flatfish_HCR_MSE.R") 
 #drive   <-"//home//cwetzel//h_cwetzel//PhD"
 drive   <-"C:" #"//home//cwetzel//h_cwetzel"
-start.n <- 97
-end.n   <- 97
-hcr.opt <- "hcr_20_5"
+start.n <- 1
+end.n   <- 200
+hcr.opt <- "hcr_30_10"
 #HCR Options: 25_5; 40_10; 30_10; 20_5
 steep     <- 0.85
 steep.set <- 0.85
-sigmaR    <- 0.60
-auto      <- TRUE
+sigmaR    <- 0.40 #0.60
+auto      <- FALSE
 reduce.data <- FALSE
+fish.sel.mat  <- TRUE # sensitivity to shift fishery selectivity
+fish.sel.pre  <- FALSE # sensitivity to shift fishery selectivity
 
 tantalus <- FALSE
 github   <- TRUE
@@ -44,6 +46,8 @@ if (steep == steep.set  & sigmaR == 0.60){ directory <-  paste0(drive, "/PhD/Cha
 if (steep != steep.set){ directory <-  paste0(drive, "/PhD/Chapter4/Steep_", steep*100, "_", steep.set*100,"/")}
 if (steep == steep.set & auto == TRUE ) { directory <-  paste0(drive, "/PhD/Chapter4/Steep_", steep*100,"_auto", "/") }
 if (steep == steep.set & auto == TRUE & sigmaR == 0.60) { directory <-  paste0(drive, "/PhD/Chapter4/Steep_", steep*100,"_sigmaR_", sigmaR*100,"_auto", "/") }
+if (steep == steep.set & fish.sel.mat == TRUE ){ directory <-  paste0(drive, "/PhD/Chapter4/Steep_", steep*100, "_selec_at_mat/") }
+if (steep == steep.set & fish.sel.pre == TRUE ){ directory <-  paste0(drive, "/PhD/Chapter4/Steep_", steep*100, "_selec_pre_mat/") }
 dir.create(directory)
 directory <<- paste0(directory, "hcr_option_", hcr.opt,"_", catchEQ, "_sims_",start.n,"_",end.n,"/")
 dir.create(directory)

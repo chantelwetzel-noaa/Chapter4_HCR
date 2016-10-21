@@ -40,7 +40,7 @@ if (!github) {
 	source(paste(drive,"/PhD/Chapter4/code/functions/Arrays.R",sep=""))
 }
 
-if (github == TRUE) {
+if (github) {
 	temp.drive = drive; drive = "C:"
 
 	#Life-History Parameters ============================================================
