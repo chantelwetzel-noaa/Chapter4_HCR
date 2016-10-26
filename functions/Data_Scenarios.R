@@ -22,10 +22,10 @@ max.F 		 <- 4
 # Shift fishery selectivity for senstivitiy 
 if (fish.sel.mat){
 	fsp = array(NA, dim=c(2, 2, 6))
-	fsp[1,1,] = c(37,  3,  3, 14, -999, -999) #fishery 1 females
-	fsp[1,2,] = c(37,  3,  3, 14, -999, -999) #fishery 1 males
-	fsp[2,1,] = c(36,  3,  3, 14, -999, -999) #fishery 2 females
-	fsp[2,2,] = c(36,  3,  3, 14, -999, -999) #fishery 2 males
+	fsp[1,1,] = c(39.6,  3,  3.5, 14, -999, -999) #fishery 1 females
+	fsp[1,2,] = c(39.6,  3,  3.5, 14, -999, -999) #fishery 1 males
+	fsp[2,1,] = c(39.6,  3,  3.5, 14, -999, -999) #fishery 2 females
+	fsp[2,2,] = c(39.6,  3,  3.5, 14, -999, -999) #fishery 2 males
 }
 
 # Shift fishery selectivity for senstivitiy 

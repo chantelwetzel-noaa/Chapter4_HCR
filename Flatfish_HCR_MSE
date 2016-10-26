@@ -13,7 +13,7 @@
 drive   <-"C:" #"//home//cwetzel//h_cwetzel"
 start.n <- 1
 end.n   <- 200
-hcr.opt <- "hcr_30_10"
+hcr.opt <- "hcr_20_5"
 #HCR Options: 25_5; 40_10; 30_10; 20_5
 steep     <- 0.85
 steep.set <- 0.85

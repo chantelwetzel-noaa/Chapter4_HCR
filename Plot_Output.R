@@ -13,13 +13,13 @@
 drive = "C:"
 
 steep.vec <- c("Steep_85", "Steep_75", "Steep_95", "Steep_85_75", "Steep_85_95",  "Steep_85_data_30",
-				"Steep_85_sigmaR_60", "Steep_85_auto", 
+				"Steep_85_sigmaR_60", "Steep_85_auto", "Steep_85_selec_at_mat",
 				"Steep_85_auto_sigmaR_60")
 
 hcr.vec   <- c( "hcr_20_5_ramp_constant",
 				"hcr_25_5_ramp_constant", 
-				"hcr_30_10_ramp_constant", 
-			    "hcr_40_10_ramp_constant")
+				"hcr_30_10_ramp_constant") 
+			    #"hcr_40_10_ramp_constant")
 
 dir = paste0(drive, "/PhD/Chapter4/output")
 
@@ -84,7 +84,7 @@ for (a in 1:length(steep.vec)){
 #=====================================================================================================================
 # Distribution of management quantities for each steepness
 #=====================================================================================================================
-setwd("C:/PhD/Chapter4/WriteUp/Plots")
+#setwd("C:/PhD/Chapter4/WriteUp/Plots")
 png(filename = "Management_Dist.png", width = 6.7, height = 9, units = 'in', res = 256)
 
 par(mfrow = c(3, 3), mar = c(0.7,0.5,1.2,0.5), oma = c(4,4,4,5))

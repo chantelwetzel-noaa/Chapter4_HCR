@@ -14,11 +14,12 @@ sim.range = c(1, 200)
 
 steep.vec <- c("Steep_85", "Steep_75", "Steep_95", 
 				"Steep_85_75", "Steep_85_95", "Steep_85_data_30",
-				"Steep_85_sigmaR_60","Steep_85_auto","Steep_85_auto_sigmaR_60")
+				"Steep_85_sigmaR_60","Steep_85_auto","Steep_85_auto_sigmaR_60",
+				"Steep_85_selec_at_mat")
 hcr.vec   <- c( "hcr_20_5_ramp_constant",
 				"hcr_25_5_ramp_constant", 
-				"hcr_30_10_ramp_constant", 
-			    "hcr_40_10_ramp_constant")
+				"hcr_30_10_ramp_constant")#, 
+			    #"hcr_40_10_ramp_constant")
 
 for (a in 1:length(steep.vec)){
 
@@ -235,10 +236,10 @@ for (a in 1:length(steep.vec)){
 
 	om.all <- ss.all <- hcr.all <- med.all <-  list()
 
-	om.out 	<- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_om_all")
-	ss.out 	<- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_ss_all")
-	hcr.out <- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_hcr_all")
-	med.out <- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_medians_all")
+	om.out 	<- paste0(drive,"/PhD/Chapter4/temp_output/", steep.vec[a], "_om_all")
+	ss.out 	<- paste0(drive,"/PhD/Chapter4/temp_output/", steep.vec[a], "_ss_all")
+	hcr.out <- paste0(drive,"/PhD/Chapter4/temp_output/", steep.vec[a], "_hcr_all")
+	med.out <- paste0(drive,"/PhD/Chapter4/temp_output/", steep.vec[a], "_medians_all")
 
 	om.all$ssb  <- ssb
 	om.all$depl <- depl
