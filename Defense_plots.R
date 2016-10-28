@@ -10,7 +10,7 @@
 
 
 #Load in the R objects from the Simulation Eval Code ========================================
-drive = "E:/SyncBack"
+drive = "G:/SyncBack"
 
 steep.vec <- c("Steep_75","Steep_85", "Steep_95") #"Steep_85_75", "Steep_85_95",  "Steep_85_data_30",
 				#"Steep_85_sigmaR_60", "Steep_85_auto", "Steep_85_auto_sigmaR_60")
@@ -106,7 +106,7 @@ set.bw = 0.021
 main.lab = c("Steepness = 0.75", "Steepness = 0.85", "Steepness = 0.95")
 adj.vec  = c(-3, 0, 3)
 col.vec = c("deepskyblue", "dodgerblue3")
-col.vec = c(shale,blue)
+col.vec = c(shale,blue, green)
 
 for (a in 1:length(steep.vec)) {
 	offset = 0
@@ -120,7 +120,7 @@ for (a in 1:length(steep.vec)) {
 					to = quantile(om.out[[a]]$depl[1,x,], quant.vec[3]))
 	xx = c(out$x, rev(out$x)); yy = c(out$y + offset, rev(rep(offset, length(out$y))))
 	polygon(xx, yy, col = col.vec[2], lty = 0)
-	lines(c(target[1], target[1]), c(0, max(yy)+ 2), lty = 2, lwd = 2) # Target line
+	lines(c(target[1], target[1]), c(0, max(yy)+ 2), col = col.vec[3], lty = 1, lwd = 3) # Target line
 	print.letter(xy = c(0.80, dep.yvec[1] - 0.05), label = paste("med =", print(med.dist[a,1],2)), cex = letter.cex)
 	print.letter(xy = c(0.77, dep.yvec[1]), label = paste0("> target = ", print(100*above.target[a,1],0), "%"), cex = letter.cex)
 	box()
@@ -136,7 +136,7 @@ for (a in 1:length(steep.vec)) {
 		xx = c(out$x, rev(out$x)); yy = c(out$y + offset, rev(rep(offset, length(out$y))))
 		polygon(xx, yy, col = col.vec[2], lty = 0)
 		abline(h = offset, lty = 1)		
-		lines(c(target[b], target[b]), c(offset , max(yy) + 2), lty = 2, lwd = 2)
+		lines(c(target[b], target[b]), c(offset , max(yy) + 2), col = col.vec[3], lty = 1, lwd = 3)
 		print.letter(xy = c(0.80, dep.yvec[b] - 0.05), label = paste("med =",print(med.dist[a,b],2)), cex = letter.cex)
 		print.letter(xy = c(0.75, dep.yvec[b]), label = paste0("> target = ", print(100*above.target[a,b],0), "%"), cex = letter.cex)
 	}
@@ -166,7 +166,7 @@ set.bw = 0.021
 main.lab = c("Steepness = 0.75", "Steepness = 0.85", "Steepness = 0.95")
 adj.vec  = c(-3, 0, 3)
 col.vec = c("deepskyblue", "dodgerblue3")
-col.vec = c(shale,blue)
+col.vec = c(shale,blue, green)
 
 for (a in 1:1) {
 	offset = 0
@@ -180,7 +180,7 @@ for (a in 1:1) {
 					to = quantile(om.out[[a]]$depl[1,x,], quant.vec[3]))
 	xx = c(out$x, rev(out$x)); yy = c(out$y + offset, rev(rep(offset, length(out$y))))
 	polygon(xx, yy, col = col.vec[2], lty = 0)
-	lines(c(target[1], target[1]), c(0, max(yy)+ 2), lty = 2, lwd = 2) # Target line
+	lines(c(target[1], target[1]), c(0, max(yy)+ 2), col = col.vec[3], lty = 1, lwd = 3) # Target line
 	print.letter(xy = c(0.80, dep.yvec[1] - 0.05), label = paste("med =", print(med.dist[a,1],2)), cex = letter.cex)
 	print.letter(xy = c(0.77, dep.yvec[1]), label = paste0("> target = ", print(100*above.target[a,1],0), "%"), cex = letter.cex)
 	box()
@@ -196,7 +196,7 @@ for (a in 1:1) {
 		xx = c(out$x, rev(out$x)); yy = c(out$y + offset, rev(rep(offset, length(out$y))))
 		polygon(xx, yy, col = col.vec[2], lty = 0)
 		abline(h = offset, lty = 1)		
-		lines(c(target[b], target[b]), c(offset , max(yy) + 2), lty = 2, lwd = 2)
+		lines(c(target[b], target[b]), c(offset , max(yy) + 2), col = col.vec[3], lty = 1, lwd = 3)
 		print.letter(xy = c(0.80, dep.yvec[b] - 0.05), label = paste("med =",print(med.dist[a,b],2)), cex = letter.cex)
 		print.letter(xy = c(0.75, dep.yvec[b]), label = paste0("> target = ", print(100*above.target[a,b],0), "%"), cex = letter.cex)
 	}
