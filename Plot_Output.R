@@ -13,15 +13,14 @@
 drive = "C:"
 
 steep.vec <- c("Steep_85", "Steep_75", "Steep_95", "Steep_85_75", "Steep_85_95",  "Steep_85_data_30",
-				"Steep_85_sigmaR_60", "Steep_85_auto", "Steep_85_selec_at_mat",
-				"Steep_85_auto_sigmaR_60")
+				"Steep_85_sigmaR_60", "Steep_85_auto","Steep_85_auto_sigmaR_60")#  "Steep_85_selec_at_mat")
 
 hcr.vec   <- c( "hcr_20_5_ramp_constant",
 				"hcr_25_5_ramp_constant", 
-				"hcr_30_10_ramp_constant") 
-			    #"hcr_40_10_ramp_constant")
+				"hcr_30_10_ramp_constant", 
+			    "hcr_40_10_ramp_constant")
 
-dir = paste0(drive, "/PhD/Chapter4/output")
+dir = paste0(drive, "/PhD/Chapter4/output_Jrn_Sub")
 
 om.out <- ss.out <- hcr.out <- med.out <- list()
 for (a in 1:length(steep.vec)){
@@ -60,6 +59,7 @@ labels2 =c(expression(italic("h")['COR 85']),
 		   expression(sigma[R]),
 		   expression(rho[R]),
 		   expression(sigma[R]~' & '~rho[R]))
+		   #'Selectivity')
 
 hcr.lab = c("20-5", "25-5", "30-10", "40-10")
 x = 151:175 # Summary years for the operating model 
@@ -84,7 +84,7 @@ for (a in 1:length(steep.vec)){
 #=====================================================================================================================
 # Distribution of management quantities for each steepness
 #=====================================================================================================================
-#setwd("C:/PhD/Chapter4/WriteUp/Plots")
+setwd("C:/PhD/Chapter4/WriteUp/Plots")
 png(filename = "Management_Dist.png", width = 6.7, height = 9, units = 'in', res = 256)
 
 par(mfrow = c(3, 3), mar = c(0.7,0.5,1.2,0.5), oma = c(4,4,4,5))
@@ -117,23 +117,29 @@ for (a in 1:3){
 	if (a == 3) { axis(side = 1, at = seq(50, 300, 50)); mtext(side = 1, line = 3, "MSY")}
 	print.letter(xy = c(0.05, 0.95), label = alpha.label[a], cex = letter.cex)
 }
+dev.off()
 #=====================================================================================================================
 # Relative Stock Size Distributions
 #=====================================================================================================================
 setwd("C:/PhD/Chapter4/WriteUp/Plots")
-png(filename = "Depletion_Dist_95SI.png", width = 6.7, height = 8.5, units = 'in', res = 256)
+png(filename = "Depletion_Dist_95SI_proxy.png", width = 6.7, height = 8.5, units = 'in', res = 256)
 par(mfrow = c(3, 3), mar = c(0.7,0.5,1.2,0.5), oma = c(4,4,4,5))
 letter.cex = 1; axis.cex = 1.1; label.cex = 0.8
 dep.xvec = c(0.2, 0.35, 0.40, 0.50); dep.yvec = c(0.22, 0.47, 0.72, 0.97)
 sim = 17; ymax = 10 * length(hcr.vec) 
 lab.pos = c(rep(0.21,3), 0.16, 0.15, 0.14, 0.14, 0.14, 0.23)
 set.bw = 0.021 
+proxy.lab = expression(">"~italic("B")[PROXY]~'=')
+
+x.max = 0.70
 
 for (a in 1:length(steep.vec)) {
+
 	offset = 0
 	out = density(om.out[[a]]$depl[1,x,], bw = set.bw, from = 0.01, to = 1)
 	xx = c(out$x, rev(out$x)); yy = c(out$y + offset, rev(rep(offset, length(out$y))))
-	plot("","",xlim = c(0, 0.70), ylim = c(0, ymax), main = '', xlab = "", ylab = '', axes = F, yaxs="i", xaxs = 'i')
+	#plot("","",xlim = c(0, 0.70), ylim = c(0, ymax), main = '', xlab = "", ylab = '', axes = F, yaxs="i", xaxs = 'i')
+	plot("","",xlim = c(0, x.max), ylim = c(0, ymax), main = '', xlab = "", ylab = '', axes = F, yaxs="i", xaxs = 'i')
 	polygon(xx, yy, col = "grey", lty = 0)		
 	out = density(om.out[[a]]$depl[1,x,], bw = set.bw, from = quantile(om.out[[a]]$depl[1,x,], quant.vec[1]), 
 					to = quantile(om.out[[a]]$depl[1,x,], quant.vec[3]))
@@ -141,7 +147,8 @@ for (a in 1:length(steep.vec)) {
 	polygon(xx, yy, col = "grey50", lty = 0)
 	lines(c(target[1], target[1]), c(0, max(yy)+ 2), lty = 2) # Target line
 	print.letter(xy = c(0.80, dep.yvec[1] - 0.05), label = paste("med =", print(med.dist[a,1],2)), cex = letter.cex)
-	print.letter(xy = c(0.77, dep.yvec[1]), label = paste0("> target = ", print(100*above.target[a,1],0), "%"), cex = letter.cex)
+	print.letter(xy = c(0.69, dep.yvec[1]), label = proxy.lab, cex = letter.cex)
+	print.letter(xy = c(0.92, dep.yvec[1]), label = paste0(print(100*above.target[a,1],0), "%"), cex = letter.cex)
 	#print.letter(xy = c(0.77, dep.yvec[1] - 0.10), label = paste("si =", si[a,1]), cex = letter.cex)
 	#print.letter(xy = c(0.80, dep.yvec[1] - 0.10), label = paste("med =", print(med.dist[a,1],2)), cex = letter.cex)
 	#print.letter(xy = c(0.77, dep.yvec[1] ), label = paste0("> target = ", print(100*above.target[a,1],0), "%"), cex = letter.cex)
@@ -164,7 +171,9 @@ for (a in 1:length(steep.vec)) {
 		#print.letter(xy = c(0.77, dep.yvec[b] ), label = paste0("> target = ", print(100*above.target[a,b],0), "%"), cex = letter.cex)
 		#print.letter(xy = c(0.77, dep.yvec[b] - 0.05), label = paste("si =", si[a,b]), cex = letter.cex)
 		print.letter(xy = c(0.80, dep.yvec[b] - 0.05), label = paste("med =",print(med.dist[a,b],2)), cex = letter.cex)
-		print.letter(xy = c(0.77, dep.yvec[b]), label = paste0("> target = ", print(100*above.target[a,b],0), "%"), cex = letter.cex)
+		print.letter(xy = c(0.69, dep.yvec[b]), label = proxy.lab, cex = letter.cex)
+		print.letter(xy = c(0.92, dep.yvec[b]), label = paste0(print(100*above.target[a,1],0), "%"), cex = letter.cex)
+		#print.letter(xy = c(0.77, dep.yvec[b]), label = paste0("> target = ", print(100*above.target[a,b],0), "%"), cex = letter.cex)
 		#print.letter(xy = c(0.77, dep.yvec[b] - 0.10), label = paste("si =", si[a,b]), cex = letter.cex)
 	}
 	if (a > 6) { axis(side = 1, at = seq(0, 0.60, 0.10), cex.axis = axis.cex)}

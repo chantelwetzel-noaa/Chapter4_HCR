@@ -14,12 +14,15 @@ sim.range = c(1, 200)
 
 steep.vec <- c("Steep_85", "Steep_75", "Steep_95", 
 				"Steep_85_75", "Steep_85_95", "Steep_85_data_30",
-				"Steep_85_sigmaR_60","Steep_85_auto","Steep_85_auto_sigmaR_60",
+				"Steep_85_sigmaR_60","Steep_85_auto_sigmaR_60", # "Steep_85_auto",
 				"Steep_85_selec_at_mat")
+
 hcr.vec   <- c( "hcr_20_5_ramp_constant",
 				"hcr_25_5_ramp_constant", 
-				"hcr_30_10_ramp_constant")#, 
-			    #"hcr_40_10_ramp_constant")
+				"hcr_30_10_ramp_constant", 
+			    "hcr_40_10_ramp_constant")
+
+fish.sel.mat = fish.sel.pre = FALSE
 
 for (a in 1:length(steep.vec)){
 
@@ -224,7 +227,7 @@ for (a in 1:length(steep.vec)){
 		target.20.est[b,]  = target.20.est[b,] / N
 		
 		target.true[b,] = apply(ifelse(depl[b,ass.yrs[1]:ass.yrs[length(ass.yrs)],] < (target[b] - 0.10*target[b]), 0, 
-									      ifelse(depl[b,ass.yrs[1]:ass.yrs[length(ass.yrs)],] < (target[b] + 0.10*target[b]), 1, 0)), 1, sum)
+					            ifelse(depl[b,ass.yrs[1]:ass.yrs[length(ass.yrs)],] < (target[b] + 0.10*target[b]), 1, 0)), 1, sum)
 
 		target.20.true[b,] = apply(ifelse(depl[b,ass.yrs[1]:ass.yrs[length(ass.yrs)],] < (target[b] - 0.20*target[b]), 0, 
 									         ifelse(depl[b,ass.yrs[1]:ass.yrs[length(ass.yrs)],] < (target[b] + 0.20*target[b]), 1, 0)), 1, sum)
@@ -236,10 +239,10 @@ for (a in 1:length(steep.vec)){
 
 	om.all <- ss.all <- hcr.all <- med.all <-  list()
 
-	om.out 	<- paste0(drive,"/PhD/Chapter4/temp_output/", steep.vec[a], "_om_all")
-	ss.out 	<- paste0(drive,"/PhD/Chapter4/temp_output/", steep.vec[a], "_ss_all")
-	hcr.out <- paste0(drive,"/PhD/Chapter4/temp_output/", steep.vec[a], "_hcr_all")
-	med.out <- paste0(drive,"/PhD/Chapter4/temp_output/", steep.vec[a], "_medians_all")
+	om.out 	<- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_om_all")
+	ss.out 	<- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_ss_all")
+	hcr.out <- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_hcr_all")
+	med.out <- paste0(drive,"/PhD/Chapter4/output/", steep.vec[a], "_medians_all")
 
 	om.all$ssb  <- ssb
 	om.all$depl <- depl
