@@ -223,12 +223,13 @@ for (a in 1:length(steep.vec)){
 	ave.catch[a,] = apply(hcr.out[[a]]$catch.ave, 1, median)
 	aav[a,]       = apply(hcr.out[[a]]$aav, 1, median) }
 
-png(filename = "Tradeoffs_msy_3.png", width = 12, height = 8.5, units = 'in', res = 256)
+png(filename = "Tradeoffs_msy_1.png", width = 12, height = 8.5, units = 'in', res = 256)
+main.lab = c("Steepness = 0.75", "Steepness = 0.85", "Steepness = 0.95")
 
 pch.vec = 21:24
 pch.col = c('red', 'green', 'blue') #pch.col = c(1,  "grey50", "white")
 #pch.col = c(green, blue, shale)
-par(mfrow = c(1, 3), mar = c(3,4,3,3), oma = c(2,2,1,0))
+par(mfrow = c(1, 1), mar = c(3,4,3,3), oma = c(2,2,1,0))
 letter.cex = 1.6; axis.cex = 1.8; label.cex = 1.5; pch.cex = 3; main.cex = 1
 part2 = expression("Biomass"[target] %+-% "10%")
 max.prob = 0.50 ; max.catch = 190; min.catch = 120
@@ -236,12 +237,12 @@ max.prob = 0.50 ; max.catch = 190; min.catch = 120
 #1 ave catch vs. 10% for correct steep range
 plot(target10[1,], ave.catch[1,], axes = F, xlim = c(0,max.prob), ylim = c(min.catch,max.catch), yaxs = 'i', 
 	xaxs = 'i', xlab = "", ylab = "")
-abline(h = msy.vec[1], lty = 2, col = 'grey70')
-points(0.03, msy.vec[1], pch = pch.vec[1], bg = pch.col[2], cex = pch.cex)
-abline(h = msy.vec[2], lty = 2, col = 'grey70')
-points(0.03, msy.vec[2], pch = pch.vec[1], bg = pch.col[1], cex = pch.cex)
-abline(h = msy.vec[3], lty = 2, col = 'grey70')
-points(0.03, msy.vec[3], pch = pch.vec[1], bg = pch.col[3], cex = pch.cex)
+#abline(h = msy.vec[1], lty = 2, col = 'grey70')
+#points(0.03, msy.vec[1], pch = pch.vec[1], bg = pch.col[2], cex = pch.cex)
+#abline(h = msy.vec[2], lty = 2, col = 'grey70')
+#points(0.03, msy.vec[2], pch = pch.vec[1], bg = pch.col[1], cex = pch.cex)
+#abline(h = msy.vec[3], lty = 2, col = 'grey70')
+#points(0.03, msy.vec[3], pch = pch.vec[1], bg = pch.col[3], cex = pch.cex)
 box()
 for(a in 1:3){
 	lines(target10[a,], ave.catch[a,], lty = 2)
@@ -256,40 +257,65 @@ for(a in 1:3){
 }
 
 #2 aav vs 10%  probability
-plot(target10[1,], aav[1,], axes = F, xlim = c(0,max.prob), ylim = c(0, 12), yaxs = 'i', xaxs = 'i', xlab = "", ylab = "")
-box()
-for(a in 1:3){
-	lines(target10[a,], aav[a,], lty = 2)
-	points(target10[a,1], aav[a,1], pch = pch.vec[1], cex = pch.cex, bg = pch.col[a])
-	axis(side = 1, cex.axis = axis.cex)
-	axis(side = 2, las = 1, at = seq(0, 15, 5), cex.axis = axis.cex)
-	mtext(side = 2, "Average annual variation - catch", line = 3, cex = label.cex)
-	mtext(side = 1, part2, line = 3.5, cex = label.cex)
-	for(b in 2:length(hcr.vec)){
-		points(target10[a,b], aav[a,b], pch = pch.vec[b], cex = pch.cex, bg = pch.col[a])
-	}
-}
+#plot(target10[1,], aav[1,], axes = F, xlim = c(0,max.prob), ylim = c(0, 12), yaxs = 'i', xaxs = 'i', xlab = "", ylab = "")
+#plot(aav[1,], target10[1,], axes = F, xlim = c(0,12), ylim = c(0, max.prob), yaxs = 'i', xaxs = 'i', xlab = "", ylab = "")
+
+#box()
+#for(a in 1:3){
+#	lines(aav[a,], target10[a,], lty = 2)
+#	points(aav[a,1], target10[a,1], pch = pch.vec[1], cex = pch.cex, bg = pch.col[a])
+#	axis(side = 2, cex.axis = axis.cex)
+#	axis(side = 1, las = 1, at = seq(0, 15, 5), cex.axis = axis.cex)
+#	mtext(side = 1, "Average annual variation - catch", line = 3, cex = label.cex)
+#	mtext(side = 2, part2, line = 3.5, cex = label.cex)
+#	for(b in 2:length(hcr.vec)){
+#		points(aav[a,b], target10[a,b], pch = pch.vec[b], cex = pch.cex, bg = pch.col[a])
+#	}
+#	#lines(target10[a,], aav[a,], lty = 2)
+#	#points(target10[a,1], aav[a,1], pch = pch.vec[1], cex = pch.cex, bg = pch.col[a])
+#	#axis(side = 1, cex.axis = axis.cex)
+#	#axis(side = 2, las = 1, at = seq(0, 15, 5), cex.axis = axis.cex)
+#	#mtext(side = 2, "Average annual variation - catch", line = 3, cex = label.cex)
+#	#mtext(side = 1, part2, line = 3.5, cex = label.cex)
+#	#for(b in 2:length(hcr.vec)){
+#	#	points(target10[a,b], aav[a,b], pch = pch.vec[b], cex = pch.cex, bg = pch.col[a])
+#	#}
+#}
 #print.letter(xy = c(0.08, 0.95), label = alpha.label[2], cex = letter.cex)
 #mtext(side = 3, comb.lab[1], line = 0, cex = main.cex)
 legend('topright', legend = main.lab, pch = rep(16,3), col = pch.col, bty = 'n', cex = letter.cex + 0.5)
 legend('topright', legend = main.lab, pch = rep(21,3), col = rep(1,3), bty = 'n', cex = letter.cex + 0.5)
 
 #3 aav vs 10%  probability
-plot(ave.catch[1,], aav[1,], axes = F, xlim = c(min.catch,max.catch), ylim = c(0, 12), yaxs = 'i', xaxs = 'i', xlab = "", ylab = "")
-box()
-for(a in 1:3){
-	lines(ave.catch[a,], aav[a,], lty = 2)
-	points(ave.catch[a,1], aav[a,1], pch = pch.vec[1], cex = pch.cex, bg = pch.col[a])
-	axis(side = 1, at = seq(120, 180, 20),cex.axis = axis.cex) 
-	axis(side = 2, las = 1, at = c(0,5,10,15), cex.axis = axis.cex)
-	mtext(side = 2, "Average annual variation - catch", line = 3, cex = label.cex)
-	mtext(side = 1, "Average catch", line = 3, cex = label.cex)
-	for(b in 2:length(hcr.vec)){
-		points(ave.catch[a,b], aav[a,b], pch = pch.vec[b], cex = pch.cex, bg = pch.col[a])
-	}
-}
+#plot(aav[1,], ave.catch[1,], axes = F, ylim = c(min.catch,max.catch), xlim = c(0, 12), yaxs = 'i', xaxs = 'i', xlab = "", ylab = "")
+#box()
+#for(a in 1:3){
+#	lines(aav[a,], ave.catch[a,], lty = 2)
+#	points(aav[a,1], ave.catch[a,1], pch = pch.vec[1], cex = pch.cex, bg = pch.col[a])
+#	axis(side = 2, las = 1,at = seq(120, 180, 20),cex.axis = axis.cex) 
+#	axis(side = 1, las = 1, at = c(0,5,10,15), cex.axis = axis.cex)
+#	mtext(side = 1, "Average annual variation - catch", line = 3, cex = label.cex)
+#	mtext(side = 2, "Average catch", line = 3.5, cex = label.cex)
+#	for(b in 2:length(hcr.vec)){
+#		points(aav[a,b], ave.catch[a,b], pch = pch.vec[b], cex = pch.cex, bg = pch.col[a])
+#	}
+#}
 #print.letter(xy = c(0.08, 0.95), label = alpha.label[3], cex = letter.cex)
-legend('topright', pch = pch.vec, legend = c("20-5", "25-5", "30-10", "40-10"), bty = 'n', cex = letter.cex + 0.5)
+#plot(ave.catch[1,], aav[1,], axes = F, xlim = c(min.catch,max.catch), ylim = c(0, 12), yaxs = 'i', xaxs = 'i', xlab = "", ylab = "")
+#box()
+#for(a in 1:3){
+#	lines(ave.catch[a,], aav[a,], lty = 2)
+#	points(ave.catch[a,1], aav[a,1], pch = pch.vec[1], cex = pch.cex, bg = pch.col[a])
+#	axis(side = 1, at = seq(120, 180, 20),cex.axis = axis.cex) 
+#	axis(side = 2, las = 1, at = c(0,5,10,15), cex.axis = axis.cex)
+#	mtext(side = 2, "Average annual variation - catch", line = 3, cex = label.cex)
+#	mtext(side = 1, "Average catch", line = 3, cex = label.cex)
+#	for(b in 2:length(hcr.vec)){
+#		points(ave.catch[a,b], aav[a,b], pch = pch.vec[b], cex = pch.cex, bg = pch.col[a])
+#	}
+#}
+##print.letter(xy = c(0.08, 0.95), label = alpha.label[3], cex = letter.cex)
+#legend('topleft', pch = pch.vec, legend = c("20-5", "25-5", "30-10", "40-10"), bty = 'n', cex = letter.cex + 0.5)
 
 
 dev.off()
