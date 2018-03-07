@@ -38,7 +38,7 @@ print.letter <- function(label="(a)",xy=c(0.1,0.925),...) {   #... means any new
   text(x=text.x, y=text.y, labels=label, ...)             
 }
 
-setwd("C:/PhD/Chapter4/WriteUp/Plots")
+setwd("C:/PhD/Chapter4/Poster")
 png(filename = "HCR_wMMST.png", width = 6.7, height = 6, units = 'in', res = 256)
 par(mfrow = c(2,2), mar = rep(0.50, 4), oma = c(3,3,3,3))
 ofl.col = 1; abc.col = 'grey50' ; t.col = "grey63"; acl.col = 1
